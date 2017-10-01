@@ -14,4 +14,4 @@
  * limitations under the License.
  */
 
-rootProject.name = 'elastic-agent-skeleton-plugin'
+rootProject.name = 'kubernetes-elastic-agent'
