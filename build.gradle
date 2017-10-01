@@ -16,19 +16,17 @@
 
 apply plugin: 'java'
 
-group = 'com.example.elasticagent.template'
-version = '0.1-SNAPSHOT'
+group = 'cd.go.contrib'
+version = '0.0.1'
 
-// these values that go into plugin.xml
-// TODO: change these
 project.ext.pluginDesc = [
-    id         : 'com.example.elasticagent.foocloud',
+    id         : 'com.example.elasticagent.Kubernetes',
     version    : project.version,
-    goCdVersion: '16.12.0',
-    name       : 'Example Elastic Agent Plugin',
-    description: 'Some longer description of your plugin goes here',
-    vendorName : 'Acme Corp',
-    vendorUrl  : 'https://github.com/user/repository'
+    goCdVersion: '17.10.0',
+    name       : 'Kubernetes Elastic Agent Plugin',
+    description: 'Kubernetes Based Elastic Agent Plugins for GoCD',
+    vendorName : 'GoCD Contributors',
+    vendorUrl  : 'https://github.com/gocd-contrib/kubernetes-elastic-agents'
 ]
 
 // Force 1.7 compatibility to ensure that it works with older JVMs
