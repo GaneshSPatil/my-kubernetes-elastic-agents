@@ -25,19 +25,13 @@ import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-/*
- * TODO: add any additional configuration fields here.
- */
 public class GetPluginConfigurationExecutor implements RequestExecutor {
 
     private static final Gson GSON = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
 
     public static final Field GO_SERVER_URL = new NonBlankField("go_server_url", "Go Server URL", null, true, false, "0");
     public static final Field AUTOREGISTER_TIMEOUT = new PositiveNumberField("auto_register_timeout", "Agent auto-register Timeout (in minutes)", "10", true, false, "1");
-
-    public static final Field API_SERVER_URL = new NonBlankField("api_url", "API URL", null, true, false, "2");
-    public static final Field API_USER = new NonBlankField("api_user", "API User", null, true, false, "3");
-    public static final Field API_KEY = new NonBlankField("api_key", "API Key", null, true, false, "4");
+    public static final Field KUBERNETES_CLUSTER_URL = new NonBlankField("kubernetes_cluster_url", "Kubernetes Cluster URL", null, true, false, "2");
 
     public static final Map<String, Field> FIELDS = new LinkedHashMap<>();
 
@@ -45,13 +39,10 @@ public class GetPluginConfigurationExecutor implements RequestExecutor {
         FIELDS.put(GO_SERVER_URL.key(), GO_SERVER_URL);
         FIELDS.put(AUTOREGISTER_TIMEOUT.key(), AUTOREGISTER_TIMEOUT);
 
-        FIELDS.put(API_SERVER_URL.key(), API_SERVER_URL);
-        FIELDS.put(API_USER.key(), API_USER);
-        FIELDS.put(API_KEY.key(), API_KEY);
+        FIELDS.put(KUBERNETES_CLUSTER_URL.key(), KUBERNETES_CLUSTER_URL);
     }
 
     public GoPluginApiResponse execute() {
         return new DefaultGoPluginApiResponse(200, GSON.toJson(FIELDS));
     }
-
 }

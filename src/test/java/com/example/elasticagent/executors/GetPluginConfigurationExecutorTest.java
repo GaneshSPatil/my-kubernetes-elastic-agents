@@ -58,27 +58,14 @@ public class GetPluginConfigurationExecutorTest {
                 "    \"secure\": false,\n" +
                 "    \"display-order\": \"1\"\n" +
                 "  },\n" +
-                "  \"api_url\": {\n" +
-                "    \"display-name\": \"API URL\",\n" +
+                "  \"kubernetes_cluster_url\": {\n" +
+                "    \"display-name\": \"Kubernetes Cluster URL\",\n" +
                 "    \"required\": true,\n" +
                 "    \"secure\": false,\n" +
                 "    \"display-order\": \"2\"\n" +
-                "  },\n" +
-                "  \"api_user\": {\n" +
-                "    \"display-name\": \"API User\",\n" +
-                "    \"required\": true,\n" +
-                "    \"secure\": false,\n" +
-                "    \"display-order\": \"3\"\n" +
-                "  },\n" +
-                "  \"api_key\": {\n" +
-                "    \"display-name\": \"API Key\",\n" +
-                "    \"required\": true,\n" +
-                "    \"secure\": false,\n" +
-                "    \"display-order\": \"4\"\n" +
                 "  }\n" +
                 "}";
 
         JSONAssert.assertEquals(expectedJSON, response.responseBody(), true);
-
     }
 }
