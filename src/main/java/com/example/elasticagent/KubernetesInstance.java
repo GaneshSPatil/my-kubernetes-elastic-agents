@@ -27,8 +27,7 @@ import org.joda.time.DateTime;
 
 import java.util.*;
 
-import static com.example.elasticagent.Constants.CREATED_BY_LABEL_KEY;
-import static com.example.elasticagent.Constants.ENVIRONMENT_LABEL_KEY;
+import static com.example.elasticagent.Constants.*;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
 public class KubernetesInstance {
@@ -69,11 +68,10 @@ public class KubernetesInstance {
         return name != null ? name.hashCode() : 0;
     }
 
-    public static KubernetesInstance create(CreateAgentRequest request, PluginSettings settings) {
-        String containerName = "kubernetes-elastic-agent" + UUID.randomUUID().toString();
+    public static KubernetesInstance create(CreateAgentRequest request, PluginSettings settings, KubernetesClient kubernetes) {
+        String containerName = KUBERNETES_POD_NAME + UUID.randomUUID().toString();
         Date createdAt = new Date();
 
-        HashMap<String, String> labels = labelsFrom(request, createdAt);
         String imageName = image(request.properties());
         List<String> env = environmentFrom(request, settings, containerName);
         List<EnvVar> envVars = new ArrayList<>();
@@ -86,19 +84,23 @@ public class KubernetesInstance {
         Config build = new ConfigBuilder().withMasterUrl(settings.getKubernetesClusterUrl()).build();
         KubernetesClient client = new DefaultKubernetesClient(build);
 
-        final Container GoCD_CONTAINER = new Container(null, null, envVars, imageName, "IfNotPresent", null, null, containerName, null, null, null, null, null, null, null, false, null, null);
+        Container container = new Container();
+        container.setName(containerName);
+        container.setEnv(envVars);
+        container.setImage(imageName);
+        container.setImagePullPolicy("IfNotPresent");
 
         ObjectMeta podMetadata = new ObjectMeta();
 
-        podMetadata.setLabels(labels);
+        podMetadata.setLabels(labelsFrom(request, createdAt));
         podMetadata.setName(containerName);
 
         PodSpec podSpec = new PodSpec();
-        podSpec.setContainers(new ArrayList<Container>(){{ add(GoCD_CONTAINER); }});
+        podSpec.setContainers(new ArrayList<Container>(){{ add(container); }});
         PodStatus podStatus = new PodStatus();
         Pod elasticAgentPod = new Pod("v1", "Pod", podMetadata, podSpec, podStatus);
 
-        client.pods().inNamespace("default").create(elasticAgentPod);
+        client.pods().inNamespace(KUBERNETES_NAMESPACE_KEY).create(elasticAgentPod);
 
         return fromInstanceInfo(elasticAgentPod);
     }
@@ -107,7 +109,7 @@ public class KubernetesInstance {
         ObjectMeta metadata = elasticAgentPod.getMetadata();
         String containerName = metadata.getName();
         Date createdAt = new Date();
-        createdAt.setTime(Long.valueOf(metadata.getLabels().get("created_at")));
+        createdAt.setTime(Long.valueOf(metadata.getLabels().get(POD_CREATED_AT_LABEL_KEY)));
         String environment = metadata.getLabels().get(ENVIRONMENT_LABEL_KEY);
         return new KubernetesInstance(containerName, createdAt, environment);
     }
@@ -115,16 +117,7 @@ public class KubernetesInstance {
     private static List<String> environmentFrom(CreateAgentRequest request, PluginSettings settings, String containerName) {
         Set<String> env = new HashSet<>();
 
-//        env.addAll(settings.getEnvironmentVariables());
-//        if (StringUtils.isNotBlank(request.properties().get("Environment"))) {
-//            env.addAll(splitIntoLinesAndTrimSpaces(request.properties().get("Environment")));
-//        }
-
-        env.addAll(Arrays.asList(
-                "GO_EA_MODE=" + mode(),
-                "GO_EA_SERVER_URL=" + settings.getGoServerUrl()
-        ));
-
+        env.addAll(Arrays.asList("GO_EA_SERVER_URL=" + settings.getGoServerUrl()));
         env.addAll(request.autoregisterPropertiesAsEnvironmentVars(containerName));
 
         return new ArrayList<>(env);
@@ -138,23 +131,10 @@ public class KubernetesInstance {
             labels.put(ENVIRONMENT_LABEL_KEY, request.environment());
         }
 
-        labels.put("created_at", String.valueOf(createdAt.getTime()));
-
-        labels.put("kind", "kubernetes-elastic-agent");
+        labels.put(POD_CREATED_AT_LABEL_KEY, String.valueOf(createdAt.getTime()));
+        labels.put(KUBERNETES_POD_KIND_LABEL_KEY, KUBERNETES_POD_KIND_LABEL_VALUE);
 
         return labels;
-    }
-
-    private static String mode() {
-        if ("false".equals(System.getProperty("rails.use.compressed.js"))) {
-            return "dev";
-        }
-
-        if ("true".equalsIgnoreCase(System.getProperty("rails.use.compressed.js"))) {
-            return "prod";
-        }
-
-        return "";
     }
 
     private static String image(Map<String, String> properties) {
@@ -173,6 +153,6 @@ public class KubernetesInstance {
     public void terminate(PluginSettings settings) {
         Config build = new ConfigBuilder().withMasterUrl(settings.getKubernetesClusterUrl()).build();
         KubernetesClient client = new DefaultKubernetesClient(build);
-        client.pods().inNamespace("default").withName(name).delete();
+        client.pods().inNamespace(KUBERNETES_NAMESPACE_KEY).withName(name).delete();
     }
 }

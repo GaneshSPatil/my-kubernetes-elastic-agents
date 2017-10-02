@@ -31,6 +31,8 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static com.example.elasticagent.Constants.*;
+
 public class KubernetesAgentInstances implements AgentInstances<KubernetesInstance> {
 
     public static final Logger LOG = Logger.getLoggerFor(KubernetesAgentInstances.class);
@@ -42,11 +44,16 @@ public class KubernetesAgentInstances implements AgentInstances<KubernetesInstan
 
     @Override
     public KubernetesInstance create(CreateAgentRequest request, PluginSettings settings) throws Exception {
-        KubernetesInstance instance = KubernetesInstance.create(request, settings);
+        KubernetesInstance instance = KubernetesInstance.create(request, settings, kubernetes(settings));
         register(instance, request.properties());
 
         return instance;
     }
+
+    private KubernetesClient kubernetes(PluginSettings settings) {
+        Config build = new ConfigBuilder().withMasterUrl(settings.getKubernetesClusterUrl()).build();
+        return new DefaultKubernetesClient(build);
+    };
 
     @Override
     public void terminate(String agentId, PluginSettings settings) throws Exception {
@@ -63,18 +70,17 @@ public class KubernetesAgentInstances implements AgentInstances<KubernetesInstan
     @Override
     public void terminateUnregisteredInstances(PluginSettings settings, Agents agents) throws Exception {
         KubernetesAgentInstances toTerminate = unregisteredAfterTimeout(settings, agents);
-//        if (toTerminate.instances.isEmpty()) {
-//            return;
-//        }
-//
-//        LOG.warn("Terminating instances that did not register " + toTerminate.instances.keySet());
-//        for (KubernetesInstance container : toTerminate.instances.values()) {
-//            terminate(container.name(), settings);
-//        }
+        if (toTerminate.instances.isEmpty()) {
+            return;
+        }
+
+        LOG.warn("Terminating instances that did not register " + toTerminate.instances.keySet());
+        for (KubernetesInstance container : toTerminate.instances.values()) {
+            terminate(container.name(), settings);
+        }
     }
 
     @Override
-    // TODO: Implement me!
     public Agents instancesCreatedAfterTimeout(PluginSettings settings, Agents agents) {
         ArrayList<Agent> oldAgents = new ArrayList<>();
         for (Agent agent : agents.agents()) {
@@ -92,22 +98,19 @@ public class KubernetesAgentInstances implements AgentInstances<KubernetesInstan
 
     @Override
     public void refreshAll(PluginRequest pluginRequest) throws Exception {
-        PluginSettings settings = pluginRequest.getPluginSettings();
-
-        Config build = new ConfigBuilder().withMasterUrl(settings.getKubernetesClusterUrl()).build();
-        KubernetesClient client = new DefaultKubernetesClient(build);
-
-        PodList list = client.pods().inNamespace("default").list();
+        KubernetesClient client = kubernetes(pluginRequest.getPluginSettings());
+        PodList list = client.pods().inNamespace(KUBERNETES_NAMESPACE_KEY).list();
 
         if (!refreshed) {
             for (Pod pod : list.getItems()) {
                 Map<String, String> podLabels = pod.getMetadata().getLabels();
                 if(podLabels != null) {
-                    if(podLabels.containsKey("kind") && podLabels.get("kind").equals("kubernetes-elastic-agent")) {
+                    if(podLabels.containsKey(KUBERNETES_POD_KIND_LABEL_KEY) && podLabels.get(KUBERNETES_NAMESPACE_KEY).equals(KUBERNETES_POD_KIND_LABEL_VALUE)) {
                         register(KubernetesInstance.fromInstanceInfo(pod), getInstanceProperties(pod.getMetadata().getName()));
                     }
                 }
             }
+
             refreshed = true;
         }
     }
@@ -122,7 +125,6 @@ public class KubernetesAgentInstances implements AgentInstances<KubernetesInstan
         return instances.get(agentId);
     }
 
-    // used by tests
     public boolean hasInstance(String agentId) {
         return instances.containsKey(agentId);
     }
@@ -135,18 +137,15 @@ public class KubernetesAgentInstances implements AgentInstances<KubernetesInstan
     private KubernetesAgentInstances unregisteredAfterTimeout(PluginSettings settings, Agents knownAgents) throws Exception {
         Period period = settings.getAutoRegisterPeriod();
         KubernetesAgentInstances unregisteredContainers = new KubernetesAgentInstances();
+        KubernetesClient client = kubernetes(settings);
 
         for (String instanceName : instances.keySet()) {
             if (knownAgents.containsAgentWithId(instanceName)) {
                 continue;
             }
+            Pod pod = client.pods().inNamespace(KUBERNETES_NAMESPACE_KEY).withName(instanceName).get();
 
-            Config build = new ConfigBuilder().withMasterUrl(settings.getKubernetesClusterUrl()).build();
-            KubernetesClient client = new DefaultKubernetesClient(build);
-
-            Pod pod = client.pods().inNamespace("default").withName(instanceName).get();
-
-            String createdAt = pod.getMetadata().getLabels().get("created_at");
+            String createdAt = pod.getMetadata().getLabels().get(POD_CREATED_AT_LABEL_KEY);
             DateTime dateTimeCreated = new DateTime(Long.valueOf(createdAt));
 
             if (clock.now().isAfter(dateTimeCreated.plus(period))) {
