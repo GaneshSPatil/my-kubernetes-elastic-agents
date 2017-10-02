@@ -33,9 +33,9 @@ import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
 import static com.example.elasticagent.Constants.PLUGIN_IDENTIFIER;
 
 @Extension
-public class ExamplePlugin implements GoPlugin {
+public class KubernetesPlugin implements GoPlugin {
 
-    public static final Logger LOG = Logger.getLoggerFor(ExamplePlugin.class);
+    public static final Logger LOG = Logger.getLoggerFor(KubernetesPlugin.class);
 
     private PluginRequest pluginRequest;
     private AgentInstances agentInstances;
@@ -43,7 +43,7 @@ public class ExamplePlugin implements GoPlugin {
     @Override
     public void initializeGoApplicationAccessor(GoApplicationAccessor accessor) {
         pluginRequest = new PluginRequest(accessor);
-        agentInstances = new ExampleAgentInstances();
+        agentInstances = new KubernetesAgentInstances();
     }
 
     @Override

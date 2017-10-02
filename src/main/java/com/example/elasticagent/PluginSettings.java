@@ -23,7 +23,6 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import org.joda.time.Period;
 
-// TODO: Implement any settings that your plugin needs
 public class PluginSettings {
     public static final Gson GSON = new GsonBuilder()
             .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
@@ -39,16 +38,8 @@ public class PluginSettings {
     private String autoRegisterTimeout;
 
     @Expose
-    @SerializedName("api_user")
-    private String apiUser;
-
-    @Expose
-    @SerializedName("api_key")
-    private String apiKey;
-
-    @Expose
-    @SerializedName("api_url")
-    private String apiUrl;
+    @SerializedName("kubernetes_cluster_url")
+    private String kubernetesClusterUrl;
 
     private Period autoRegisterPeriod;
 
@@ -59,25 +50,24 @@ public class PluginSettings {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (!(o instanceof PluginSettings)) return false;
 
         PluginSettings that = (PluginSettings) o;
 
         if (goServerUrl != null ? !goServerUrl.equals(that.goServerUrl) : that.goServerUrl != null) return false;
         if (autoRegisterTimeout != null ? !autoRegisterTimeout.equals(that.autoRegisterTimeout) : that.autoRegisterTimeout != null)
             return false;
-        if (apiUser != null ? !apiUser.equals(that.apiUser) : that.apiUser != null) return false;
-        if (apiKey != null ? !apiKey.equals(that.apiKey) : that.apiKey != null) return false;
-        return apiUrl != null ? apiUrl.equals(that.apiUrl) : that.apiUrl == null;
+        if (kubernetesClusterUrl != null ? !kubernetesClusterUrl.equals(that.kubernetesClusterUrl) : that.kubernetesClusterUrl != null)
+            return false;
+        return autoRegisterPeriod != null ? autoRegisterPeriod.equals(that.autoRegisterPeriod) : that.autoRegisterPeriod == null;
     }
 
     @Override
     public int hashCode() {
         int result = goServerUrl != null ? goServerUrl.hashCode() : 0;
         result = 31 * result + (autoRegisterTimeout != null ? autoRegisterTimeout.hashCode() : 0);
-        result = 31 * result + (apiUser != null ? apiUser.hashCode() : 0);
-        result = 31 * result + (apiKey != null ? apiKey.hashCode() : 0);
-        result = 31 * result + (apiUrl != null ? apiUrl.hashCode() : 0);
+        result = 31 * result + (kubernetesClusterUrl != null ? kubernetesClusterUrl.hashCode() : 0);
+        result = 31 * result + (autoRegisterPeriod != null ? autoRegisterPeriod.hashCode() : 0);
         return result;
     }
 
@@ -95,19 +85,11 @@ public class PluginSettings {
         return autoRegisterTimeout;
     }
 
-    public String getApiUser() {
-        return apiUser;
-    }
-
-    public String getApiKey() {
-        return apiKey;
-    }
-
-    public String getApiUrl() {
-        return apiUrl;
-    }
-
     public String getGoServerUrl() {
         return goServerUrl;
+    }
+
+    public String getKubernetesClusterUrl() {
+        return kubernetesClusterUrl;
     }
 }

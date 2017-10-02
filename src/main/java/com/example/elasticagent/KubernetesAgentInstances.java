@@ -17,24 +17,30 @@
 package com.example.elasticagent;
 
 import com.example.elasticagent.requests.CreateAgentRequest;
+import io.fabric8.kubernetes.api.model.Pod;
+import io.fabric8.kubernetes.api.model.PodList;
+import io.fabric8.kubernetes.client.Config;
+import io.fabric8.kubernetes.client.ConfigBuilder;
+import io.fabric8.kubernetes.client.DefaultKubernetesClient;
+import io.fabric8.kubernetes.client.KubernetesClient;
 
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class ExampleAgentInstances implements AgentInstances<ExampleInstance> {
+public class KubernetesAgentInstances implements AgentInstances<KubernetesInstance> {
 
-    private final ConcurrentHashMap<String, ExampleInstance> instances = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, KubernetesInstance> instances = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, Map<String, String>> instanceProperties = new ConcurrentHashMap<>();
 
     private boolean refreshed;
     public Clock clock = Clock.DEFAULT;
 
     @Override
-    public ExampleInstance create(CreateAgentRequest request, PluginSettings settings) throws Exception {
-        // TODO: Implement me!
-        throw new UnsupportedOperationException();
-//        ExampleInstance instance = ExampleInstance.create(request, settings);
-//        register(instance);
-//        return instance;
+    public KubernetesInstance create(CreateAgentRequest request, PluginSettings settings) throws Exception {
+        KubernetesInstance instance = KubernetesInstance.create(request, settings);
+        register(instance, request.properties());
+        return instance;
     }
 
     @Override
@@ -42,7 +48,7 @@ public class ExampleAgentInstances implements AgentInstances<ExampleInstance> {
         // TODO: Implement me!
         throw new UnsupportedOperationException();
 
-//        ExampleInstance instance = instances.get(agentId);
+//        KubernetesInstance instance = instances.get(agentId);
 //        if (instance != null) {
 //            instance.terminate(docker(settings));
 //        } else {
@@ -56,13 +62,13 @@ public class ExampleAgentInstances implements AgentInstances<ExampleInstance> {
         // TODO: Implement me!
         throw new UnsupportedOperationException();
 
-//        ExampleAgentInstances toTerminate = unregisteredAfterTimeout(settings, agents);
+//        KubernetesAgentInstances toTerminate = unregisteredAfterTimeout(settings, agents);
 //        if (toTerminate.instances.isEmpty()) {
 //            return;
 //        }
 //
 //        LOG.warn("Terminating instances that did not register " + toTerminate.instances.keySet());
-//        for (ExampleInstance container : toTerminate.instances.values()) {
+//        for (KubernetesInstance container : toTerminate.instances.values()) {
 //            terminate(container.name(), settings);
 //        }
     }
@@ -72,7 +78,7 @@ public class ExampleAgentInstances implements AgentInstances<ExampleInstance> {
     public Agents instancesCreatedAfterTimeout(PluginSettings settings, Agents agents) {
         ArrayList<Agent> oldAgents = new ArrayList<>();
         for (Agent agent : agents.agents()) {
-            ExampleInstance instance = instances.get(agent.elasticAgentId());
+            KubernetesInstance instance = instances.get(agent.elasticAgentId());
             if (instance == null) {
                 continue;
             }
@@ -86,22 +92,32 @@ public class ExampleAgentInstances implements AgentInstances<ExampleInstance> {
 
     @Override
     public void refreshAll(PluginRequest pluginRequest) throws Exception {
-        // TODO: Implement me!
-        throw new UnsupportedOperationException();
+        PluginSettings settings = pluginRequest.getPluginSettings();
 
-//        if (!refreshed) {
-//            TODO: List all instances from the cloud provider and select the ones that are created by this plugin
-//            TODO: Most cloud providers allow applying some sort of labels or tags to instances that you may find of use
-//            List<InstanceInfo> instanceInfos = cloud.listInstances().filter(...)
-//            for (Instance instanceInfo: instanceInfos) {
-//                  register(ExampleInstance.fromInstanceInfo(instanceInfo))
-//            }
-//            refreshed = true;
-//        }
+        Config build = new ConfigBuilder().withMasterUrl(settings.getKubernetesClusterUrl()).build();
+        KubernetesClient client = new DefaultKubernetesClient(build);
+
+        PodList list = client.pods().inNamespace("default").list();
+
+        if (!refreshed) {
+            for (Pod pod : list.getItems()) {
+                Map<String, String> podLabels = pod.getMetadata().getLabels();
+                if(podLabels != null) {
+                    if(podLabels.containsKey("kind") && podLabels.get("kind").equals("kubernetes-elastic-agent")) {
+                        register(KubernetesInstance.fromInstanceInfo(pod), getInstanceProperties(pod));
+                    }
+                }
+            }
+            refreshed = true;
+        }
+    }
+
+    private Map<String, String> getInstanceProperties(Pod pod) {
+        return instanceProperties.get(pod.getMetadata().getName());
     }
 
     @Override
-    public ExampleInstance find(String agentId) {
+    public KubernetesInstance find(String agentId) {
         return instances.get(agentId);
     }
 
@@ -110,13 +126,14 @@ public class ExampleAgentInstances implements AgentInstances<ExampleInstance> {
         return instances.containsKey(agentId);
     }
 
-    private void register(ExampleInstance instance) {
+    private void register(KubernetesInstance instance, Map<String, String> properties) {
         instances.put(instance.name(), instance);
+        instanceProperties.put(instance.name(), properties);
     }
 
-//    private ExampleAgentInstances unregisteredAfterTimeout(PluginSettings settings, Agents knownAgents) throws Exception {
+//    private KubernetesAgentInstances unregisteredAfterTimeout(PluginSettings settings, Agents knownAgents) throws Exception {
 //        Period period = settings.getAutoRegisterPeriod();
-//        ExampleAgentInstances unregisteredContainers = new ExampleAgentInstances();
+//        KubernetesAgentInstances unregisteredContainers = new KubernetesAgentInstances();
 //
 //        for (String instanceName : instances.keySet()) {
 //            if (knownAgents.containsAgentWithId(instanceName)) {
@@ -128,7 +145,7 @@ public class ExampleAgentInstances implements AgentInstances<ExampleInstance> {
 //            DateTime dateTimeCreated = new DateTime(instanceInfo.created());
 //
 //            if (clock.now().isAfter(dateTimeCreated.plus(period))) {
-//                unregisteredContainers.register(ExampleInstance.fromInstanceInfo(instanceInfo));
+//                unregisteredContainers.register(KubernetesInstance.fromInstanceInfo(instanceInfo));
 //            }
 //        }
 //        return unregisteredContainers;

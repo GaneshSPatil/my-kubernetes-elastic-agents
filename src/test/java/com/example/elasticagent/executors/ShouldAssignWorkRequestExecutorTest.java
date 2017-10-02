@@ -32,14 +32,14 @@ import static org.junit.Assert.assertThat;
 
 public class ShouldAssignWorkRequestExecutorTest extends BaseTest {
 
-    private AgentInstances<ExampleInstance> agentInstances;
-    private ExampleInstance instance;
+    private AgentInstances<KubernetesInstance> agentInstances;
+    private KubernetesInstance instance;
     private final String environment = "production";
     private Map<String, String> properties = new HashMap<>();
 
     @Before
     public void setUp() throws Exception {
-        agentInstances = new ExampleAgentInstances();
+        agentInstances = new KubernetesAgentInstances();
         properties.put("foo", "bar");
         properties.put("Image", "gocdcontrib/ubuntu-docker-elastic-agent");
         instance = agentInstances.create(new CreateAgentRequest(UUID.randomUUID().toString(), properties, environment), createSettings());
