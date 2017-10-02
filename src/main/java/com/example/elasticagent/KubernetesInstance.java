@@ -82,12 +82,12 @@ public class KubernetesInstance {
         ResourceRequirements resources = new ResourceRequirements();
         resources.setLimits(new HashMap<String, Quantity>(){{
             String maxMemory = request.properties().get("MaxMemory");
-            if(maxMemory != null) {
+            if(!maxMemory.equals("")) {
                 Size mem = Size.parse(maxMemory);
                 put("memory", new Quantity(String.valueOf(mem.toMegabytes()), "Mi"));
             }
 
-            if(request.properties().get("MaxCPU") != null) {
+            if(!request.properties().get("MaxCPU").equals("")) {
                 put("cpu", new Quantity(request.properties().get("MaxCPU")));
             }
         }});
