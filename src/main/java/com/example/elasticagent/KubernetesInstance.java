@@ -83,7 +83,6 @@ public class KubernetesInstance {
             envVars.add(new EnvVar(split[0], split[1], null));
         }
 
-
         Config build = new ConfigBuilder().withMasterUrl(settings.getKubernetesClusterUrl()).build();
         KubernetesClient client = new DefaultKubernetesClient(build);
 
@@ -169,5 +168,11 @@ public class KubernetesInstance {
             return image + ":latest";
         }
         return image;
+    }
+
+    public void terminate(PluginSettings settings) {
+        Config build = new ConfigBuilder().withMasterUrl(settings.getKubernetesClusterUrl()).build();
+        KubernetesClient client = new DefaultKubernetesClient(build);
+        client.pods().inNamespace("default").withName(name).delete();
     }
 }

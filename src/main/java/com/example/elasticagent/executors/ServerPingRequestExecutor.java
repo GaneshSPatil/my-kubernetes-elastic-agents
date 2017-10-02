@@ -36,27 +36,27 @@ public class ServerPingRequestExecutor implements RequestExecutor {
 
     @Override
     public GoPluginApiResponse execute() throws Exception {
-//        PluginSettings pluginSettings = pluginRequest.getPluginSettings();
-//
-//        Agents allAgents = pluginRequest.listAgents();
-//        Agents missingAgents = new Agents();
-//
-//        for (Agent agent : allAgents.agents()) {
-//            if (agentInstances.find(agent.elasticAgentId()) == null) {
-//                LOG.warn("Was expecting a container with name " + agent.elasticAgentId() + ", but it was missing!");
-//                missingAgents.add(agent);
-//            }
-//        }
-//
-//        Agents agentsToDisable = agentInstances.instancesCreatedAfterTimeout(pluginSettings, allAgents);
-//        agentsToDisable.addAll(missingAgents);
-//
-//        disableIdleAgents(agentsToDisable);
-//
-//        allAgents = pluginRequest.listAgents();
-//        terminateDisabledAgents(allAgents, pluginSettings);
-//
-//        agentInstances.terminateUnregisteredInstances(pluginSettings, allAgents);
+        PluginSettings pluginSettings = pluginRequest.getPluginSettings();
+
+        Agents allAgents = pluginRequest.listAgents();
+        Agents missingAgents = new Agents();
+
+        for (Agent agent : allAgents.agents()) {
+            if (agentInstances.find(agent.elasticAgentId()) == null) {
+                LOG.warn("Was expecting a container with name " + agent.elasticAgentId() + ", but it was missing!");
+                missingAgents.add(agent);
+            }
+        }
+
+        Agents agentsToDisable = agentInstances.instancesCreatedAfterTimeout(pluginSettings, allAgents);
+        agentsToDisable.addAll(missingAgents);
+
+        disableIdleAgents(agentsToDisable);
+
+        allAgents = pluginRequest.listAgents();
+        terminateDisabledAgents(allAgents, pluginSettings);
+
+        agentInstances.terminateUnregisteredInstances(pluginSettings, allAgents);
 
         return DefaultGoPluginApiResponse.success("");
     }

@@ -17,12 +17,15 @@
 package com.example.elasticagent;
 
 import com.example.elasticagent.requests.CreateAgentRequest;
+import com.thoughtworks.go.plugin.api.logging.Logger;
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.api.model.PodList;
 import io.fabric8.kubernetes.client.Config;
 import io.fabric8.kubernetes.client.ConfigBuilder;
 import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClient;
+import org.joda.time.DateTime;
+import org.joda.time.Period;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -30,6 +33,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class KubernetesAgentInstances implements AgentInstances<KubernetesInstance> {
 
+    public static final Logger LOG = Logger.getLoggerFor(KubernetesAgentInstances.class);
     private final ConcurrentHashMap<String, KubernetesInstance> instances = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, Map<String, String>> instanceProperties = new ConcurrentHashMap<>();
 
@@ -46,24 +50,19 @@ public class KubernetesAgentInstances implements AgentInstances<KubernetesInstan
 
     @Override
     public void terminate(String agentId, PluginSettings settings) throws Exception {
-        // TODO: Implement me!
-        throw new UnsupportedOperationException();
-
-//        KubernetesInstance instance = instances.get(agentId);
-//        if (instance != null) {
-//            instance.terminate(docker(settings));
-//        } else {
-//            LOG.warn("Requested to terminate an instance that does not exist " + agentId);
-//        }
-//        instances.remove(agentId);
+        KubernetesInstance instance = instances.get(agentId);
+        if (instance != null) {
+            instance.terminate(settings);
+        } else {
+            LOG.warn("Requested to terminate an instance that does not exist " + agentId);
+        }
+        instances.remove(agentId);
+        instanceProperties.remove(agentId);
     }
 
     @Override
     public void terminateUnregisteredInstances(PluginSettings settings, Agents agents) throws Exception {
-        // TODO: Implement me!
-        throw new UnsupportedOperationException();
-
-//        KubernetesAgentInstances toTerminate = unregisteredAfterTimeout(settings, agents);
+        KubernetesAgentInstances toTerminate = unregisteredAfterTimeout(settings, agents);
 //        if (toTerminate.instances.isEmpty()) {
 //            return;
 //        }
@@ -133,23 +132,27 @@ public class KubernetesAgentInstances implements AgentInstances<KubernetesInstan
         instanceProperties.put(instance.name(), properties);
     }
 
-//    private KubernetesAgentInstances unregisteredAfterTimeout(PluginSettings settings, Agents knownAgents) throws Exception {
-//        Period period = settings.getAutoRegisterPeriod();
-//        KubernetesAgentInstances unregisteredContainers = new KubernetesAgentInstances();
-//
-//        for (String instanceName : instances.keySet()) {
-//            if (knownAgents.containsAgentWithId(instanceName)) {
-//                continue;
-//            }
-//
-//            // TODO: Connect to the cloud provider to fetch information about this instance
-//            InstanceInfo instanceInfo = connection.inspectInstance(instanceName);
-//            DateTime dateTimeCreated = new DateTime(instanceInfo.created());
-//
-//            if (clock.now().isAfter(dateTimeCreated.plus(period))) {
-//                unregisteredContainers.register(KubernetesInstance.fromInstanceInfo(instanceInfo));
-//            }
-//        }
-//        return unregisteredContainers;
-//    }
+    private KubernetesAgentInstances unregisteredAfterTimeout(PluginSettings settings, Agents knownAgents) throws Exception {
+        Period period = settings.getAutoRegisterPeriod();
+        KubernetesAgentInstances unregisteredContainers = new KubernetesAgentInstances();
+
+        for (String instanceName : instances.keySet()) {
+            if (knownAgents.containsAgentWithId(instanceName)) {
+                continue;
+            }
+
+            Config build = new ConfigBuilder().withMasterUrl(settings.getKubernetesClusterUrl()).build();
+            KubernetesClient client = new DefaultKubernetesClient(build);
+
+            Pod pod = client.pods().inNamespace("default").withName(instanceName).get();
+
+            String createdAt = pod.getMetadata().getLabels().get("created_at");
+            DateTime dateTimeCreated = new DateTime(Long.valueOf(createdAt));
+
+            if (clock.now().isAfter(dateTimeCreated.plus(period))) {
+                unregisteredContainers.register(KubernetesInstance.fromInstanceInfo(pod), getInstanceProperties(instanceName));
+            }
+        }
+        return unregisteredContainers;
+    }
 }
