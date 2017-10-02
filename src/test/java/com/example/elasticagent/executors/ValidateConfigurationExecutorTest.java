@@ -41,27 +41,17 @@ public class ValidateConfigurationExecutorTest {
                 "    \"key\": \"auto_register_timeout\"\n" +
                 "  },\n" +
                 "  {\n" +
-                "    \"message\": \"API URL must not be blank.\",\n" +
-                "    \"key\": \"api_url\"\n" +
-                "  },\n" +
-                "  {\n" +
-                "    \"message\": \"API User must not be blank.\",\n" +
-                "    \"key\": \"api_user\"\n" +
-                "  },\n" +
-                "  {\n" +
-                "    \"message\": \"API Key must not be blank.\",\n" +
-                "    \"key\": \"api_key\"\n" +
-                "  },\n" +
+                "    \"message\": \"Kubernetes Cluster URL must not be blank.\",\n" +
+                "    \"key\": \"kubernetes_cluster_url\"\n" +
+                "  }\n" +
                 "]", response.responseBody(), true);
     }
 
     @Test
     public void shouldValidateAGoodConfiguration() throws Exception {
         ValidatePluginSettings settings = new ValidatePluginSettings();
-        settings.put("api_url", "https://api.example.com");
-        settings.put("api_user", "bob");
-        settings.put("api_key", "p@ssw0rd");
         settings.put("go_server_url", "https://ci.example.com");
+        settings.put("kubernetes_cluster_url", "https://cluster.example.com");
         settings.put("auto_register_timeout", "10");
         GoPluginApiResponse response = new ValidateConfigurationExecutor(settings).execute();
 
