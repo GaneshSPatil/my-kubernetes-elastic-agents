@@ -17,6 +17,7 @@
 package com.example.elasticagent;
 
 import com.example.elasticagent.requests.CreateAgentRequest;
+import com.example.elasticagent.utils.Size;
 import io.fabric8.kubernetes.api.model.*;
 import io.fabric8.kubernetes.client.Config;
 import io.fabric8.kubernetes.client.ConfigBuilder;
@@ -77,6 +78,20 @@ public class KubernetesInstance {
         container.setEnv(environmentFrom(request, settings, containerName));
         container.setImage(image(request.properties()));
         container.setImagePullPolicy("IfNotPresent");
+
+        ResourceRequirements resources = new ResourceRequirements();
+        resources.setLimits(new HashMap<String, Quantity>(){{
+            String maxMemory = request.properties().get("MaxMemory");
+            if(maxMemory != null) {
+                Size mem = Size.parse(maxMemory);
+                put("memory", new Quantity(String.valueOf(mem.toMegabytes()), "Mi"));
+            }
+
+            if(request.properties().get("MaxCPU") != null) {
+                put("cpu", new Quantity(request.properties().get("MaxCPU")));
+            }
+        }});
+        container.setResources(resources);
 
         ObjectMeta podMetadata = new ObjectMeta();
 
