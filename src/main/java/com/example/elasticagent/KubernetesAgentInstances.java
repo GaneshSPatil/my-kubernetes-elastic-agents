@@ -34,7 +34,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import static com.example.elasticagent.Constants.*;
 
 public class KubernetesAgentInstances implements AgentInstances<KubernetesInstance> {
-
     public static final Logger LOG = Logger.getLoggerFor(KubernetesAgentInstances.class);
     private final ConcurrentHashMap<String, KubernetesInstance> instances = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, Map<String, String>> instanceProperties = new ConcurrentHashMap<>();

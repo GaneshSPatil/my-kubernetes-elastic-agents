@@ -21,6 +21,7 @@ import com.example.elasticagent.requests.CreateAgentRequest;
 import com.example.elasticagent.requests.ShouldAssignWorkRequest;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.HashMap;
@@ -30,8 +31,8 @@ import java.util.UUID;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
+@Ignore
 public class ShouldAssignWorkRequestExecutorTest extends BaseTest {
-
     private AgentInstances<KubernetesInstance> agentInstances;
     private KubernetesInstance instance;
     private final String environment = "production";
