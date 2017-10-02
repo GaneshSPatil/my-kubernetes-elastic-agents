@@ -24,6 +24,7 @@ import com.example.elasticagent.executors.CreateAgentRequestExecutor;
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import io.fabric8.kubernetes.api.model.EnvVar;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -67,16 +68,16 @@ public class CreateAgentRequest {
         return new CreateAgentRequestExecutor(this, agentInstances, pluginRequest);
     }
 
-    public Collection<String> autoregisterPropertiesAsEnvironmentVars(String elasticAgentId) {
-        ArrayList<String> vars = new ArrayList<>();
+    public Collection<EnvVar> autoregisterPropertiesAsEnvironmentVars(String elasticAgentId) {
+        ArrayList<EnvVar> vars = new ArrayList<>();
         if (isNotBlank(autoRegisterKey)) {
-            vars.add("GO_EA_AUTO_REGISTER_KEY=" + autoRegisterKey);
+            vars.add(new EnvVar("GO_EA_AUTO_REGISTER_KEY", autoRegisterKey, null));
         }
         if (isNotBlank(environment)) {
-            vars.add("GO_EA_AUTO_REGISTER_ENVIRONMENT=" + environment);
+            vars.add(new EnvVar("GO_EA_AUTO_REGISTER_ENVIRONMENT", environment, null));
         }
-        vars.add("GO_EA_AUTO_REGISTER_ELASTIC_AGENT_ID=" + elasticAgentId);
-        vars.add("GO_EA_AUTO_REGISTER_ELASTIC_PLUGIN_ID=" + Constants.PLUGIN_ID);
+        vars.add(new EnvVar("GO_EA_AUTO_REGISTER_ELASTIC_AGENT_ID", elasticAgentId, null));
+        vars.add(new EnvVar("GO_EA_AUTO_REGISTER_ELASTIC_PLUGIN_ID", Constants.PLUGIN_ID, null));
         return vars;
     }
 }

@@ -68,26 +68,14 @@ public class KubernetesInstance {
         return name != null ? name.hashCode() : 0;
     }
 
-    public static KubernetesInstance create(CreateAgentRequest request, PluginSettings settings, KubernetesClient kubernetes) {
+    public static KubernetesInstance create(CreateAgentRequest request, PluginSettings settings, KubernetesClient client) {
         String containerName = KUBERNETES_POD_NAME + UUID.randomUUID().toString();
         Date createdAt = new Date();
 
-        String imageName = image(request.properties());
-        List<String> env = environmentFrom(request, settings, containerName);
-        List<EnvVar> envVars = new ArrayList<>();
-
-        for (String e : env) {
-            String[] split = e.split("=");
-            envVars.add(new EnvVar(split[0], split[1], null));
-        }
-
-        Config build = new ConfigBuilder().withMasterUrl(settings.getKubernetesClusterUrl()).build();
-        KubernetesClient client = new DefaultKubernetesClient(build);
-
         Container container = new Container();
         container.setName(containerName);
-        container.setEnv(envVars);
-        container.setImage(imageName);
+        container.setEnv(environmentFrom(request, settings, containerName));
+        container.setImage(image(request.properties()));
         container.setImagePullPolicy("IfNotPresent");
 
         ObjectMeta podMetadata = new ObjectMeta();
@@ -101,7 +89,6 @@ public class KubernetesInstance {
         Pod elasticAgentPod = new Pod("v1", "Pod", podMetadata, podSpec, podStatus);
 
         client.pods().inNamespace(KUBERNETES_NAMESPACE_KEY).create(elasticAgentPod);
-
         return fromInstanceInfo(elasticAgentPod);
     }
 
@@ -114,10 +101,9 @@ public class KubernetesInstance {
         return new KubernetesInstance(containerName, createdAt, environment);
     }
 
-    private static List<String> environmentFrom(CreateAgentRequest request, PluginSettings settings, String containerName) {
-        Set<String> env = new HashSet<>();
-
-        env.addAll(Arrays.asList("GO_EA_SERVER_URL=" + settings.getGoServerUrl()));
+    private static List<EnvVar> environmentFrom(CreateAgentRequest request, PluginSettings settings, String containerName) {
+        ArrayList<EnvVar> env = new ArrayList<>();
+        env.add(new EnvVar("GO_EA_SERVER_URL", settings.getGoServerUrl(), null));
         env.addAll(request.autoregisterPropertiesAsEnvironmentVars(containerName));
 
         return new ArrayList<>(env);
