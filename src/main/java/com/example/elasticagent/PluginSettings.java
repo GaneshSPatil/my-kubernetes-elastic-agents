@@ -78,7 +78,7 @@ public class PluginSettings {
         return this.autoRegisterPeriod;
     }
 
-    private String getAutoRegisterTimeout() {
+    String getAutoRegisterTimeout() {
         if (autoRegisterTimeout == null) {
             autoRegisterTimeout = "10";
         }

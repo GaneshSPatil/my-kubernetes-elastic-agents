@@ -22,16 +22,16 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 
 public class PluginSettingsTest {
-//    @Test
-//    public void shouldDeserializeFromJSON() throws Exception {
-//        PluginSettings pluginSettings = PluginSettings.fromJSON("{" +
-//                "\"api_user\": \"bob\", " +
-//                "\"api_key\": \"p@ssw0rd\", " +
-//                "\"api_url\": \"https://cloud.example.com/api/v1\" " +
-//                "}");
-//
-//        assertThat(pluginSettings.getApiUser(), is("bob"));
-//        assertThat(pluginSettings.getApiKey(), is("p@ssw0rd"));
-//        assertThat(pluginSettings.getApiUrl(), is("https://cloud.example.com/api/v1"));
-//    }
+    @Test
+    public void shouldDeserializeFromJSON() throws Exception {
+        PluginSettings pluginSettings = PluginSettings.fromJSON("{" +
+                "\"go_server_url\": \"https://foo.go.cd/go\", " +
+                "\"auto_register_timeout\": \"10\", " +
+                "\"kubernetes_cluster_url\": \"https://cloud.example.com\" " +
+                "}");
+
+        assertThat(pluginSettings.getGoServerUrl(), is("https://foo.go.cd/go"));
+        assertThat(pluginSettings.getAutoRegisterTimeout(), is("10"));
+        assertThat(pluginSettings.getKubernetesClusterUrl(), is("https://cloud.example.com"));
+    }
 }
