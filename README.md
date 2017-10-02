@@ -1,23 +1,4 @@
-# GoCD Elastic agent plugin skeleton
-
-This is merely a skeleton plugin that plugin developers can fork to get quickly 
-started with writing elastic agent plugins for GoCD.
-
-All the documentation is hosted at https://plugin-api.gocd.io/current/elastic-agents/.
-
-
-## Getting started
-
-* Edit the file `build.gradle`
-* Edit the file `settings.gradle`
-* Edit the `GetPluginConfigurationExecutor.java` class to add any configuration fields that should be shown in the view.
-* Edit the `plugin-settings.template.html` file which contains the view for the plugin settings page of your plugin.
-* Edit the `PluginSettings.java` file which contains the model for your settings.
-* Implement the `ExampleAgentInstances.java` class to get a really basic elastic agent plugin working.
-
-## Building the code base
-
-To build the jar, run `./gradlew clean test assemble`
+# Kubernetes Elastic agent plugin for GoCD
 
 ## License
 
