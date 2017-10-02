@@ -18,6 +18,8 @@ package com.example.elasticagent;
 
 import com.example.elasticagent.requests.CreateAgentRequest;
 
+import java.util.Map;
+
 
 /**
  * Plugin implementors should implement these methods to interface to your cloud.
@@ -74,6 +76,8 @@ public interface AgentInstances<T> {
      * @param pluginRequest the plugin request object
      */
     void refreshAll(PluginRequest pluginRequest) throws Exception;
+
+    Map<String, String> getInstanceProperties(String instanceName);
 
     /**
      * This

@@ -31,13 +31,11 @@ import static org.apache.commons.lang3.StringUtils.stripToEmpty;
 
 public class ShouldAssignWorkRequestExecutor implements RequestExecutor {
     private final AgentInstances<KubernetesInstance> agentInstances;
-    private final PluginRequest pluginRequest;
     private final ShouldAssignWorkRequest request;
 
-    public ShouldAssignWorkRequestExecutor(ShouldAssignWorkRequest request, AgentInstances<KubernetesInstance> agentInstances, PluginRequest pluginRequest) {
+    public ShouldAssignWorkRequestExecutor(ShouldAssignWorkRequest request, AgentInstances<KubernetesInstance> agentInstances) {
         this.request = request;
         this.agentInstances = agentInstances;
-        this.pluginRequest = pluginRequest;
     }
 
     @Override
@@ -50,13 +48,13 @@ public class ShouldAssignWorkRequestExecutor implements RequestExecutor {
 
         boolean environmentMatches = stripToEmpty(request.environment()).equalsIgnoreCase(stripToEmpty(instance.environment()));
 
-//        Map<String, String> containerProperties = instance.properties() == null ? new HashMap<String, String>() : instance.properties();
+        Map<String, String> containerProperties = agentInstances.getInstanceProperties(instance.name()) == null ? new HashMap<String, String>() : agentInstances.getInstanceProperties(instance.name());
+
         Map<String, String> requestProperties = request.properties() == null ? new HashMap<String, String>() : request.properties();
 
-//        boolean propertiesMatch = requestProperties.equals(containerProperties);
+        boolean propertiesMatch = requestProperties.equals(containerProperties);
 
-        //todo: Do a properties match as Well
-        if (environmentMatches) {
+        if (environmentMatches && propertiesMatch) {
             return DefaultGoPluginApiResponse.success("true");
         }
 

@@ -40,6 +40,7 @@ public class KubernetesAgentInstances implements AgentInstances<KubernetesInstan
     public KubernetesInstance create(CreateAgentRequest request, PluginSettings settings) throws Exception {
         KubernetesInstance instance = KubernetesInstance.create(request, settings);
         register(instance, request.properties());
+
         return instance;
     }
 
@@ -104,7 +105,7 @@ public class KubernetesAgentInstances implements AgentInstances<KubernetesInstan
                 Map<String, String> podLabels = pod.getMetadata().getLabels();
                 if(podLabels != null) {
                     if(podLabels.containsKey("kind") && podLabels.get("kind").equals("kubernetes-elastic-agent")) {
-                        register(KubernetesInstance.fromInstanceInfo(pod), getInstanceProperties(pod));
+                        register(KubernetesInstance.fromInstanceInfo(pod), getInstanceProperties(pod.getMetadata().getName()));
                     }
                 }
             }
@@ -112,8 +113,9 @@ public class KubernetesAgentInstances implements AgentInstances<KubernetesInstan
         }
     }
 
-    private Map<String, String> getInstanceProperties(Pod pod) {
-        return instanceProperties.get(pod.getMetadata().getName());
+    @Override
+    public Map<String, String> getInstanceProperties(String instanceName) {
+        return instanceProperties.get(instanceName);
     }
 
     @Override
