@@ -24,6 +24,7 @@ import io.fabric8.kubernetes.client.Config;
 import io.fabric8.kubernetes.client.ConfigBuilder;
 import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClient;
+import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.Period;
 
@@ -52,7 +53,7 @@ public class KubernetesAgentInstances implements AgentInstances<KubernetesInstan
     private KubernetesClient kubernetes(PluginSettings settings) {
         Config build = new ConfigBuilder().withMasterUrl(settings.getKubernetesClusterUrl()).build();
         return new DefaultKubernetesClient(build);
-    };
+    }
 
     @Override
     public void terminate(String agentId, PluginSettings settings) throws Exception {
@@ -103,8 +104,8 @@ public class KubernetesAgentInstances implements AgentInstances<KubernetesInstan
         if (!refreshed) {
             for (Pod pod : list.getItems()) {
                 Map<String, String> podLabels = pod.getMetadata().getLabels();
-                if(podLabels != null) {
-                    if(podLabels.containsKey(KUBERNETES_POD_KIND_LABEL_KEY) && podLabels.get(KUBERNETES_NAMESPACE_KEY).equals(KUBERNETES_POD_KIND_LABEL_VALUE)) {
+                if (podLabels != null) {
+                    if (StringUtils.equals(KUBERNETES_POD_KIND_LABEL_VALUE, podLabels.get(KUBERNETES_POD_KIND_LABEL_KEY))) {
                         register(KubernetesInstance.fromInstanceInfo(pod), getInstanceProperties(pod.getMetadata().getName()));
                     }
                 }

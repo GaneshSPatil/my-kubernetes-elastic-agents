@@ -77,6 +77,7 @@ public class KubernetesPlugin implements GoPlugin {
                     throw new UnhandledRequestTypeException(request.requestName());
             }
         } catch (Exception e) {
+            LOG.error("Failed to handle request " + request.requestName(), e);
             throw new RuntimeException(e);
         }
     }
