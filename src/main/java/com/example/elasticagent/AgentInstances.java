@@ -77,8 +77,6 @@ public interface AgentInstances<T> {
      */
     void refreshAll(PluginRequest pluginRequest) throws Exception;
 
-    Map<String, String> getInstanceProperties(String instanceName);
-
     /**
      * This
      * Returns an agent instance with the specified <code>id</code> or <code>null</code>, if the agent is not found.

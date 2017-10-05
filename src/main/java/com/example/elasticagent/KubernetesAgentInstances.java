@@ -37,7 +37,6 @@ import static com.example.elasticagent.Constants.*;
 public class KubernetesAgentInstances implements AgentInstances<KubernetesInstance> {
     public static final Logger LOG = Logger.getLoggerFor(KubernetesAgentInstances.class);
     private final ConcurrentHashMap<String, KubernetesInstance> instances = new ConcurrentHashMap<>();
-    private final ConcurrentHashMap<String, Map<String, String>> instanceProperties = new ConcurrentHashMap<>();
 
     private boolean refreshed;
     public Clock clock = Clock.DEFAULT;
@@ -45,7 +44,7 @@ public class KubernetesAgentInstances implements AgentInstances<KubernetesInstan
     @Override
     public KubernetesInstance create(CreateAgentRequest request, PluginSettings settings) throws Exception {
         KubernetesInstance instance = KubernetesInstance.create(request, settings, kubernetes(settings));
-        register(instance, request.properties());
+        register(instance);
 
         return instance;
     }
@@ -64,7 +63,6 @@ public class KubernetesAgentInstances implements AgentInstances<KubernetesInstan
             LOG.warn("Requested to terminate an instance that does not exist " + agentId);
         }
         instances.remove(agentId);
-        instanceProperties.remove(agentId);
     }
 
     @Override
@@ -106,18 +104,13 @@ public class KubernetesAgentInstances implements AgentInstances<KubernetesInstan
                 Map<String, String> podLabels = pod.getMetadata().getLabels();
                 if (podLabels != null) {
                     if (StringUtils.equals(KUBERNETES_POD_KIND_LABEL_VALUE, podLabels.get(KUBERNETES_POD_KIND_LABEL_KEY))) {
-                        register(KubernetesInstance.fromInstanceInfo(pod), getInstanceProperties(pod.getMetadata().getName()));
+                        register(KubernetesInstance.fromInstanceInfo(pod));
                     }
                 }
             }
 
             refreshed = true;
         }
-    }
-
-    @Override
-    public Map<String, String> getInstanceProperties(String instanceName) {
-        return instanceProperties.get(instanceName);
     }
 
     @Override
@@ -129,9 +122,8 @@ public class KubernetesAgentInstances implements AgentInstances<KubernetesInstan
         return instances.containsKey(agentId);
     }
 
-    private void register(KubernetesInstance instance, Map<String, String> properties) {
+    private void register(KubernetesInstance instance) {
         instances.put(instance.name(), instance);
-        instanceProperties.put(instance.name(), properties);
     }
 
     private KubernetesAgentInstances unregisteredAfterTimeout(PluginSettings settings, Agents knownAgents) throws Exception {
@@ -149,7 +141,7 @@ public class KubernetesAgentInstances implements AgentInstances<KubernetesInstan
             DateTime dateTimeCreated = new DateTime(Long.valueOf(createdAt));
 
             if (clock.now().isAfter(dateTimeCreated.plus(period))) {
-                unregisteredContainers.register(KubernetesInstance.fromInstanceInfo(pod), getInstanceProperties(instanceName));
+                unregisteredContainers.register(KubernetesInstance.fromInstanceInfo(pod));
             }
         }
         return unregisteredContainers;

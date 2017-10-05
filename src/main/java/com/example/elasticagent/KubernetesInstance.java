@@ -34,12 +34,14 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 public class KubernetesInstance {
     private final DateTime createdAt;
     private final String environment;
+    private final Map<String, String> properties;
     private String name;
 
-    public KubernetesInstance(String name, Date createdAt, String environment) {
+    public KubernetesInstance(String name, Date createdAt, String environment, Map<String, String> properties) {
         this.name = name;
         this.createdAt = new DateTime(createdAt);
         this.environment = environment;
+        this.properties = properties;
     }
 
     public String name() {
@@ -96,6 +98,7 @@ public class KubernetesInstance {
         ObjectMeta podMetadata = new ObjectMeta();
 
         podMetadata.setLabels(labelsFrom(request, createdAt));
+        podMetadata.setAnnotations(request.properties());
         podMetadata.setName(containerName);
 
         PodSpec podSpec = new PodSpec();
@@ -113,7 +116,7 @@ public class KubernetesInstance {
         Date createdAt = new Date();
         createdAt.setTime(Long.valueOf(metadata.getLabels().get(POD_CREATED_AT_LABEL_KEY)));
         String environment = metadata.getLabels().get(ENVIRONMENT_LABEL_KEY);
-        return new KubernetesInstance(containerName, createdAt, environment);
+        return new KubernetesInstance(containerName, createdAt, environment, elasticAgentPod.getMetadata().getAnnotations());
     }
 
     private static List<EnvVar> environmentFrom(CreateAgentRequest request, PluginSettings settings, String containerName) {
