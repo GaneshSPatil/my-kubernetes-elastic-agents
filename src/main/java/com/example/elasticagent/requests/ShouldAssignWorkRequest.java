@@ -61,7 +61,7 @@ public class ShouldAssignWorkRequest {
         return GSON.fromJson(json, ShouldAssignWorkRequest.class);
     }
 
-    public RequestExecutor executor(AgentInstances agentInstances, PluginRequest pluginRequest) {
+    public RequestExecutor executor(AgentInstances agentInstances) {
         return new ShouldAssignWorkRequestExecutor(this, agentInstances);
     }
 }

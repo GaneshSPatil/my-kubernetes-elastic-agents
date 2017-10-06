@@ -18,24 +18,65 @@ package com.example.elasticagent.executors;
 
 import com.example.elasticagent.*;
 import com.example.elasticagent.requests.CreateAgentRequest;
+import io.fabric8.kubernetes.api.model.DoneablePod;
+import io.fabric8.kubernetes.api.model.ObjectMeta;
+import io.fabric8.kubernetes.api.model.Pod;
+import io.fabric8.kubernetes.api.model.PodList;
+import io.fabric8.kubernetes.client.KubernetesClient;
+import io.fabric8.kubernetes.client.dsl.MixedOperation;
+import io.fabric8.kubernetes.client.dsl.NonNamespaceOperation;
+import io.fabric8.kubernetes.client.dsl.PodResource;
 import org.joda.time.Period;
-import org.junit.Ignore;
+import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentMatcher;
+import org.mockito.Mock;
 
 import java.util.*;
 
 import static com.example.elasticagent.Agent.ConfigState.Disabled;
+import static com.example.elasticagent.Constants.KUBERNETES_NAMESPACE_KEY;
+import static com.example.elasticagent.Constants.POD_CREATED_AT_LABEL_KEY;
 import static org.junit.Assert.assertFalse;
 import static org.mockito.Mockito.*;
+import static org.mockito.MockitoAnnotations.initMocks;
 
-@Ignore
 public class ServerPingRequestExecutorTest extends BaseTest {
+    @Mock
+    KubernetesClientFactory factory;
+    @Mock
+    private KubernetesClient mockedClient;
+    @Mock
+    private MixedOperation<Pod, PodList, DoneablePod, PodResource<Pod, DoneablePod>> mockedOperation;
+    @Mock
+    private NonNamespaceOperation<Pod, PodList, DoneablePod, PodResource<Pod, DoneablePod>> mockedNamespaceOperation;
+    @Mock
+    private Pod mockedPod;
+    @Mock
+    private PodResource podResource;
+    private ObjectMeta objectMetadata;
+
+    @Before
+    public void setUp() throws Exception {
+        initMocks(this);
+        when(factory.kubernetes(any(PluginSettings.class))).thenReturn(mockedClient);
+        when(mockedClient.pods()).thenReturn(mockedOperation);
+        when(mockedOperation.inNamespace(KUBERNETES_NAMESPACE_KEY)).thenReturn(mockedNamespaceOperation);
+
+        when(mockedNamespaceOperation.create(any(Pod.class))).thenReturn(mockedPod);
+        when(mockedNamespaceOperation.withName(anyString())).thenReturn(podResource);
+        when(podResource.get()).thenReturn(mockedPod);
+
+        objectMetadata = new ObjectMeta();
+        objectMetadata.setLabels(Collections.singletonMap(POD_CREATED_AT_LABEL_KEY, String.valueOf(new Date().getTime())));
+        when(mockedPod.getMetadata()).thenReturn(objectMetadata);
+    }
+
     @Test
     public void testShouldDisableIdleAgents() throws Exception {
         String agentId = UUID.randomUUID().toString();
         final Agents agents = new Agents(Arrays.asList(new Agent(agentId, Agent.AgentState.Idle, Agent.BuildState.Idle, Agent.ConfigState.Enabled)));
-        AgentInstances agentInstances = new KubernetesAgentInstances();
+        AgentInstances agentInstances = new KubernetesAgentInstances(factory);
 
         PluginRequest pluginRequest = mock(PluginRequest.class);
         when(pluginRequest.getPluginSettings()).thenReturn(createSettings());
@@ -60,7 +101,7 @@ public class ServerPingRequestExecutorTest extends BaseTest {
     public void testShouldTerminateDisabledAgents() throws Exception {
         String agentId = UUID.randomUUID().toString();
         final Agents agents = new Agents(Arrays.asList(new Agent(agentId, Agent.AgentState.Idle, Agent.BuildState.Idle, Disabled)));
-        AgentInstances agentInstances = new KubernetesAgentInstances();
+        AgentInstances agentInstances = new KubernetesAgentInstances(factory);
 
         PluginRequest pluginRequest = mock(PluginRequest.class);
         when(pluginRequest.getPluginSettings()).thenReturn(createSettings());
@@ -74,18 +115,20 @@ public class ServerPingRequestExecutorTest extends BaseTest {
 
     @Test
     public void testShouldTerminateInstancesThatNeverAutoRegistered() throws Exception {
+        KubernetesAgentInstances agentInstances = new KubernetesAgentInstances(factory);
+        HashMap<String, String> properties = new HashMap<>();
+        properties.put("Image", "foo");
+        KubernetesInstance container = agentInstances.create(new CreateAgentRequest(null, properties, null), createSettings());
+
+        agentInstances.clock = new Clock.TestClock().forward(Period.minutes(11));
         PluginRequest pluginRequest = mock(PluginRequest.class);
+
+        objectMetadata.setName(container.name());
         when(pluginRequest.getPluginSettings()).thenReturn(createSettings());
         when(pluginRequest.listAgents()).thenReturn(new Agents());
         verifyNoMoreInteractions(pluginRequest);
 
-        KubernetesAgentInstances agentInstances = new KubernetesAgentInstances();
-        agentInstances.clock = new Clock.TestClock().forward(Period.minutes(11));
-        KubernetesInstance container = agentInstances.create(new CreateAgentRequest(null, new HashMap<String, String>(), null), createSettings());
-
-        ServerPingRequestExecutor serverPingRequestExecutor = new ServerPingRequestExecutor(agentInstances, pluginRequest);
-        serverPingRequestExecutor.execute();
-
+        new ServerPingRequestExecutor(agentInstances, pluginRequest).execute();
         assertFalse(agentInstances.hasInstance(container.name()));
     }
 
@@ -96,7 +139,7 @@ public class ServerPingRequestExecutorTest extends BaseTest {
         when(pluginRequest.listAgents()).thenReturn(new Agents(Arrays.asList(new Agent("foo", Agent.AgentState.Idle, Agent.BuildState.Idle, Agent.ConfigState.Enabled))));
         verifyNoMoreInteractions(pluginRequest);
 
-        AgentInstances agentInstances = mock(AgentInstances.class);
+        AgentInstances agentInstances = new KubernetesAgentInstances(factory);
         ServerPingRequestExecutor serverPingRequestExecutor = new ServerPingRequestExecutor(agentInstances, pluginRequest);
         serverPingRequestExecutor.execute();
     }

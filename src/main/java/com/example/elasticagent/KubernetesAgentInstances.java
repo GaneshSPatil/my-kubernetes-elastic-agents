@@ -40,10 +40,19 @@ public class KubernetesAgentInstances implements AgentInstances<KubernetesInstan
 
     private boolean refreshed;
     public Clock clock = Clock.DEFAULT;
+    private KubernetesClientFactory factory;
+
+    public KubernetesAgentInstances() {
+        this(KubernetesClientFactory.instance());
+    }
+
+    public KubernetesAgentInstances(KubernetesClientFactory factory) {
+        this.factory = factory;
+    }
 
     @Override
     public KubernetesInstance create(CreateAgentRequest request, PluginSettings settings) throws Exception {
-        KubernetesClient client = KubernetesClientFactory.instance().kubernetes(settings);
+        KubernetesClient client = factory.kubernetes(settings);
         KubernetesInstance instance = KubernetesInstance.create(request, settings, client);
         register(instance);
 
@@ -54,7 +63,7 @@ public class KubernetesAgentInstances implements AgentInstances<KubernetesInstan
     public void terminate(String agentId, PluginSettings settings) throws Exception {
         KubernetesInstance instance = instances.get(agentId);
         if (instance != null) {
-            KubernetesClient client = KubernetesClientFactory.instance().kubernetes(settings);
+            KubernetesClient client = factory.kubernetes(settings);
             instance.terminate(client);
         } else {
             LOG.warn("Requested to terminate an instance that does not exist " + agentId);
@@ -93,7 +102,7 @@ public class KubernetesAgentInstances implements AgentInstances<KubernetesInstan
 
     @Override
     public void refreshAll(PluginRequest pluginRequest) throws Exception {
-        KubernetesClient client = KubernetesClientFactory.instance().kubernetes(pluginRequest.getPluginSettings());
+        KubernetesClient client = factory.kubernetes(pluginRequest.getPluginSettings());
         PodList list = client.pods().inNamespace(KUBERNETES_NAMESPACE_KEY).list();
 
         if (!refreshed) {
@@ -126,7 +135,7 @@ public class KubernetesAgentInstances implements AgentInstances<KubernetesInstan
     private KubernetesAgentInstances unregisteredAfterTimeout(PluginSettings settings, Agents knownAgents) throws Exception {
         Period period = settings.getAutoRegisterPeriod();
         KubernetesAgentInstances unregisteredContainers = new KubernetesAgentInstances();
-        KubernetesClient client = KubernetesClientFactory.instance().kubernetes(settings);
+        KubernetesClient client = factory.kubernetes(settings);
 
         for (String instanceName : instances.keySet()) {
             if (knownAgents.containsAgentWithId(instanceName)) {

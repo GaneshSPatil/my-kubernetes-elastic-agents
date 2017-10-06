@@ -25,10 +25,6 @@ import java.util.Collection;
 import static com.example.elasticagent.Constants.API_VERSION;
 import static com.example.elasticagent.Constants.PLUGIN_IDENTIFIER;
 
-
-/**
- * Instances of this class know how to send messages to the GoCD Server.
- */
 public class PluginRequest {
     private final GoApplicationAccessor accessor;
 
@@ -44,7 +40,11 @@ public class PluginRequest {
             throw ServerRequestFailedException.getPluginSettings(response);
         }
 
-        return PluginSettings.fromJSON(response.responseBody());
+        final PluginSettings pluginSettings = PluginSettings.fromJSON(response.responseBody());
+        if(pluginSettings == null){
+            throw new PluginSettingsNotConfiguredException();
+        }
+        return pluginSettings;
     }
 
     public Agents listAgents() throws ServerRequestFailedException {

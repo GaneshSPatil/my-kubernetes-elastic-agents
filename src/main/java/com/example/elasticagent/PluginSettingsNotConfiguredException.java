@@ -16,11 +16,8 @@
 
 package com.example.elasticagent;
 
-import java.io.IOException;
-
-public abstract class BaseTest {
-    protected PluginSettings createSettings() throws IOException {
-        PluginSettings pluginSettings = new PluginSettings();
-        return pluginSettings;
+public class PluginSettingsNotConfiguredException extends RuntimeException {
+    public PluginSettingsNotConfiguredException() {
+        super("Plugin settings is not configured.");
     }
 }
