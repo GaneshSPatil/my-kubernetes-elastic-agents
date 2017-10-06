@@ -15,9 +15,13 @@
  */
 
 apply plugin: 'java'
+apply from: 'plugin-common.gradle'
+
+project.ext.pluginVersion = '0.0.1'
+project.ext.fullVersion = project.distVersion ? "${project.pluginVersion}-${project.distVersion}" : project.pluginVersion
 
 group = 'cd.go.contrib'
-version = '0.0.1'
+version = project.fullVersion
 
 project.ext.pluginDesc = [
     id         : 'com.example.elasticagent.Kubernetes',
@@ -74,36 +78,34 @@ processResources {
   }
 }
 
-test {
-  testLogging {
-    showStandardStreams = true
-
-    exceptionFormat 'full'
-
-    beforeSuite { suite ->
-      if (suite.parent) {
-        logger.quiet("Running ${suite.name}")
-      }
-    }
-
-    afterSuite { suite, result ->
-      if (suite.parent) {
-        logger.quiet("Tests run: ${result.testCount}, Failures: ${result.failedTestCount}, Skipped: ${result.skippedTestCount}, Time elapsed: ${(result.endTime - result.startTime) / 1000.00} sec")
-        if (result.resultType == TestResult.ResultType.FAILURE) {
-          logger.quiet("Test ${suite.name} FAILED")
-        }
-      } else {
-        logger.quiet("Total tests run: ${result.testCount}, Failures: ${result.failedTestCount}, Skipped: ${result.skippedTestCount}, Time elapsed: ${(result.endTime - result.startTime) / 1000.00} sec")
-      }
-    }
-  }
-}
-
 jar {
   from(configurations.compile) {
     into "lib/"
   }
   from(sourceSets.main.java) {
     into "/"
+  }
+}
+
+tasks.withType(Jar) { jarTask ->
+  preserveFileTimestamps = false
+  reproducibleFileOrder = true
+
+  ['MD5', 'SHA1', 'SHA-256'].each { algo ->
+    jarTask.outputs.files("${jarTask.archivePath}.${algo}")
+    jarTask.doLast {
+      ant.checksum file: jarTask.archivePath, format: 'MD5SUM', algorithm: algo
+    }
+  }
+
+  manifest {
+    attributes(
+            'Go-Version': project.pluginDesc.goCdVersion,
+            'Plugin-Revision': project.pluginDesc.version,
+            'Implementation-Title': project.name,
+            'Implementation-Version': project.version,
+            'Source-Compatibility': project.sourceCompatibility,
+            'Target-Compatibility': project.targetCompatibility
+    )
   }
 }
