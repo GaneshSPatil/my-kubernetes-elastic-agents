@@ -46,6 +46,10 @@ public class ServerInfo {
         return secureSiteUrl;
     }
 
+    public void setSecureSiteUrl(String secureSiteUrl) {
+        this.secureSiteUrl = secureSiteUrl;
+    }
+
     public static ServerInfo fromJSON(String json) {
         return GSON.fromJson(json, ServerInfo.class);
     }
