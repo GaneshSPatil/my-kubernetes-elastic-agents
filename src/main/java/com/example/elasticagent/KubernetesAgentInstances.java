@@ -43,35 +43,19 @@ public class KubernetesAgentInstances implements AgentInstances<KubernetesInstan
 
     @Override
     public KubernetesInstance create(CreateAgentRequest request, PluginSettings settings) throws Exception {
-        KubernetesInstance instance = KubernetesInstance.create(request, settings, kubernetes(settings));
+        KubernetesClient client = KubernetesClientFactory.instance().kubernetes(settings);
+        KubernetesInstance instance = KubernetesInstance.create(request, settings, client);
         register(instance);
 
         return instance;
-    }
-
-    private KubernetesClient kubernetes(PluginSettings settings) {
-        ConfigBuilder configBuilder = new ConfigBuilder().withMasterUrl(settings.getKubernetesClusterUrl());
-        if(StringUtils.isNotBlank(settings.getKubernetesClusterUsername())) {
-            configBuilder.withUsername(settings.getKubernetesClusterUsername());
-        }
-
-        if(StringUtils.isNotBlank(settings.getKubernetesClusterPassword())) {
-            configBuilder.withPassword(settings.getKubernetesClusterPassword());
-        }
-
-        if(StringUtils.isNotBlank(settings.getKubernetesClusterCACert())) {
-            configBuilder.withCaCertData(settings.getKubernetesClusterCACert());
-        }
-
-        Config build = configBuilder.build();
-        return new DefaultKubernetesClient(build);
     }
 
     @Override
     public void terminate(String agentId, PluginSettings settings) throws Exception {
         KubernetesInstance instance = instances.get(agentId);
         if (instance != null) {
-            instance.terminate(kubernetes(settings));
+            KubernetesClient client = KubernetesClientFactory.instance().kubernetes(settings);
+            instance.terminate(client);
         } else {
             LOG.warn("Requested to terminate an instance that does not exist " + agentId);
         }
@@ -109,7 +93,7 @@ public class KubernetesAgentInstances implements AgentInstances<KubernetesInstan
 
     @Override
     public void refreshAll(PluginRequest pluginRequest) throws Exception {
-        KubernetesClient client = kubernetes(pluginRequest.getPluginSettings());
+        KubernetesClient client = KubernetesClientFactory.instance().kubernetes(pluginRequest.getPluginSettings());
         PodList list = client.pods().inNamespace(KUBERNETES_NAMESPACE_KEY).list();
 
         if (!refreshed) {
@@ -142,7 +126,7 @@ public class KubernetesAgentInstances implements AgentInstances<KubernetesInstan
     private KubernetesAgentInstances unregisteredAfterTimeout(PluginSettings settings, Agents knownAgents) throws Exception {
         Period period = settings.getAutoRegisterPeriod();
         KubernetesAgentInstances unregisteredContainers = new KubernetesAgentInstances();
-        KubernetesClient client = kubernetes(settings);
+        KubernetesClient client = KubernetesClientFactory.instance().kubernetes(settings);
 
         for (String instanceName : instances.keySet()) {
             if (knownAgents.containsAgentWithId(instanceName)) {
