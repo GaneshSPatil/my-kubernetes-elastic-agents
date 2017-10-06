@@ -44,4 +44,8 @@ public class ServerRequestFailedException extends Exception {
     public static ServerRequestFailedException getPluginSettings(GoApiResponse response) {
         return new ServerRequestFailedException(response, "get plugin settings");
     }
+
+    public static ServerRequestFailedException serverInfo(GoApiResponse response) {
+        return new ServerRequestFailedException(response, "get server info");
+    }
 }

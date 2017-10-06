@@ -26,8 +26,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class GetPluginConfigurationExecutor implements RequestExecutor {
-
-    public static final Field GO_SERVER_URL = new NonBlankField("go_server_url", "Go Server URL", null, true, false, "0");
+    public static final Field GO_SERVER_URL = new NonBlankField("go_server_url", "Go Server URL", null, false, false, "0");
     public static final Field AUTOREGISTER_TIMEOUT = new PositiveNumberField("auto_register_timeout", "Agent auto-register Timeout (in minutes)", "10", true, false, "1");
     public static final Field KUBERNETES_CLUSTER_URL = new NonBlankField("kubernetes_cluster_url", "Kubernetes Cluster URL", null, true, false, "2");
     public static final Field KUBERNETES_CLUSTER_USERNAME = new Field("kubernetes_cluster_username", "Kubernetes Cluster Username", null, false, false, "3");
@@ -48,6 +47,6 @@ public class GetPluginConfigurationExecutor implements RequestExecutor {
     }
 
     public GoPluginApiResponse execute() {
-        return new DefaultGoPluginApiResponse(200, GSON.toJson(FIELDS));
+        return DefaultGoPluginApiResponse.success(GSON.toJson(FIELDS));
     }
 }

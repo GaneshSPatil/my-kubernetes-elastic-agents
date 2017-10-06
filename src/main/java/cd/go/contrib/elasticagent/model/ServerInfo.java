@@ -14,29 +14,40 @@
  * limitations under the License.
  */
 
-package cd.go.contrib.elasticagent;
+package cd.go.contrib.elasticagent.model;
 
-import com.google.gson.FieldNamingPolicy;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class Capabilities {
-    private static final Gson GSON = new GsonBuilder()
-            .excludeFieldsWithoutExposeAnnotation()
-            .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
-            .create();
-    @Expose
-    @SerializedName("supports_status_report")
-    private boolean supportsStatusReport;
+import static cd.go.contrib.elasticagent.utils.Util.GSON;
 
-    public Capabilities(boolean supportsStatusReport) {
-        this.supportsStatusReport = supportsStatusReport;
+public class ServerInfo {
+    @Expose
+    @SerializedName("server_id")
+    public String serverId;
+
+    @Expose
+    @SerializedName("site_url")
+    public String siteUrl;
+
+    @Expose
+    @SerializedName("secure_site_url")
+    public String secureSiteUrl;
+
+    public String getServerId() {
+        return serverId;
     }
 
-    public static Capabilities fromJSON(String json) {
-        return GSON.fromJson(json, Capabilities.class);
+    public String getSiteUrl() {
+        return siteUrl;
+    }
+
+    public String getSecureSiteUrl() {
+        return secureSiteUrl;
+    }
+
+    public static ServerInfo fromJSON(String json) {
+        return GSON.fromJson(json, ServerInfo.class);
     }
 
     public String toJSON() {

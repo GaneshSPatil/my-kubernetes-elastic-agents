@@ -47,7 +47,7 @@ public class GetPluginConfigurationExecutorTest {
         String expectedJSON = "{\n" +
                 "  \"go_server_url\": {\n" +
                 "    \"display-name\": \"Go Server URL\",\n" +
-                "    \"required\": true,\n" +
+                "    \"required\": false,\n" +
                 "    \"secure\": false,\n" +
                 "    \"display-order\": \"0\"\n" +
                 "  },\n" +

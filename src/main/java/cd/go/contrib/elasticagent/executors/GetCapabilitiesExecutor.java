@@ -16,7 +16,7 @@
 
 package cd.go.contrib.elasticagent.executors;
 
-import cd.go.contrib.elasticagent.Capabilities;
+import cd.go.contrib.elasticagent.model.Capabilities;
 import com.thoughtworks.go.plugin.api.response.DefaultGoPluginApiResponse;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
 

@@ -60,8 +60,12 @@ public class KubernetesPlugin implements GoPlugin {
     public GoPluginApiResponse handle(GoPluginApiRequest request) throws UnhandledRequestTypeException {
         try {
             switch (Request.fromString(request.requestName())) {
+                case REQUEST_GET_CAPABILITIES:
+                    return new GetCapabilitiesExecutor().execute();
                 case PLUGIN_SETTINGS_GET_ICON:
                     return new GetPluginSettingsIconExecutor().execute();
+                case PLUGIN_SETTINGS_GET_CONFIGURATION:
+                    return new GetPluginConfigurationExecutor().execute();
 
                 case REQUEST_SHOULD_ASSIGN_WORK:
                     return ShouldAssignWorkRequest.fromJSON(request.requestBody()).executor(agentInstances).execute();
@@ -77,12 +81,10 @@ public class KubernetesPlugin implements GoPlugin {
                     return new GetProfileViewExecutor().execute();
                 case REQUEST_VALIDATE_PROFILE:
                     return ProfileValidateRequest.fromJSON(request.requestBody()).executor().execute();
-                case PLUGIN_SETTINGS_GET_CONFIGURATION:
-                    return new GetPluginConfigurationExecutor().execute();
+
                 case PLUGIN_SETTINGS_VALIDATE_CONFIGURATION:
                     return ValidatePluginSettings.fromJSON(request.requestBody()).executor().execute();
-                case REQUEST_GET_CAPABILITIES:
-                    return new GetCapabilitiesExecutor().execute();
+
                 default:
                     throw new UnhandledRequestTypeException(request.requestName());
             }

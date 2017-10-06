@@ -16,6 +16,7 @@
 
 package cd.go.contrib.elasticagent;
 
+import cd.go.contrib.elasticagent.model.ServerInfo;
 import com.thoughtworks.go.plugin.api.GoApplicationAccessor;
 import com.thoughtworks.go.plugin.api.request.DefaultGoApiRequest;
 import com.thoughtworks.go.plugin.api.response.GoApiResponse;
@@ -30,6 +31,17 @@ public class PluginRequest {
 
     public PluginRequest(GoApplicationAccessor accessor) {
         this.accessor = accessor;
+    }
+
+    public ServerInfo getSeverInfo() throws ServerRequestFailedException {
+        DefaultGoApiRequest request = new DefaultGoApiRequest(Constants.REQUEST_SERVER_INFO, API_VERSION, PLUGIN_IDENTIFIER);
+        GoApiResponse response = accessor.submit(request);
+
+        if (response.responseCode() != 200) {
+            throw ServerRequestFailedException.serverInfo(response);
+        }
+
+        return ServerInfo.fromJSON(response.responseBody());
     }
 
     public PluginSettings getPluginSettings() throws ServerRequestFailedException {
