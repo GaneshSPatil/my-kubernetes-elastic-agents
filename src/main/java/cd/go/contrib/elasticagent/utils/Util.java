@@ -55,4 +55,15 @@ public class Util {
             throw new RuntimeException(e);
         }
     }
+
+    public static String fullVersion() {
+        String s = readResource("/version.properties");
+        try {
+            Properties properties = new Properties();
+            properties.load(new StringReader(s));
+            return properties.getProperty("fullVersion");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

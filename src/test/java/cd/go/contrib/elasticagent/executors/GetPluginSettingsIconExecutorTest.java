@@ -19,9 +19,11 @@ package cd.go.contrib.elasticagent.executors;
 import cd.go.contrib.elasticagent.utils.Util;
 import com.google.common.io.BaseEncoding;
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
 import org.junit.Test;
 
+import java.util.Base64;
 import java.util.HashMap;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -32,9 +34,9 @@ public class GetPluginSettingsIconExecutorTest {
     @Test
     public void rendersIconInBase64() throws Exception {
         GoPluginApiResponse response = new GetPluginSettingsIconExecutor().execute();
-        HashMap<String, String> hashMap = new Gson().fromJson(response.responseBody(), HashMap.class);
+        HashMap<String, String> hashMap = new Gson().fromJson(response.responseBody(), new TypeToken<HashMap<String, String>>(){}.getType());
         assertThat(hashMap.size(), is(2));
         assertThat(hashMap.get("content_type"), is("image/svg+xml"));
-        assertThat(Util.readResourceBytes("/kubernetes_logo.svg"), is(BaseEncoding.base64().decode(hashMap.get("data"))));
+        assertThat(Util.readResourceBytes("/kubernetes_logo.svg"), is(Base64.getDecoder().decode(hashMap.get("data"))));
     }
 }

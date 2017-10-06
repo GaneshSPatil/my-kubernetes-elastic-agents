@@ -21,13 +21,17 @@ import cd.go.contrib.elasticagent.requests.CreateAgentRequest;
 import cd.go.contrib.elasticagent.requests.ProfileValidateRequest;
 import cd.go.contrib.elasticagent.requests.ShouldAssignWorkRequest;
 import cd.go.contrib.elasticagent.requests.ValidatePluginSettings;
+import cd.go.contrib.elasticagent.utils.Util;
 import com.thoughtworks.go.plugin.api.GoApplicationAccessor;
 import com.thoughtworks.go.plugin.api.GoPlugin;
 import com.thoughtworks.go.plugin.api.GoPluginIdentifier;
 import com.thoughtworks.go.plugin.api.annotation.Extension;
+import com.thoughtworks.go.plugin.api.annotation.Load;
 import com.thoughtworks.go.plugin.api.exceptions.UnhandledRequestTypeException;
+import com.thoughtworks.go.plugin.api.info.PluginContext;
 import com.thoughtworks.go.plugin.api.logging.Logger;
 import com.thoughtworks.go.plugin.api.request.GoPluginApiRequest;
+import com.thoughtworks.go.plugin.api.response.DefaultGoPluginApiResponse;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
 
 import static cd.go.contrib.elasticagent.Constants.PLUGIN_IDENTIFIER;
@@ -46,18 +50,24 @@ public class KubernetesPlugin implements GoPlugin {
         agentInstances = new KubernetesAgentInstances();
     }
 
+    @Load
+    public void onLoad(PluginContext ctx) {
+        LOG.info("Loading plugin " + Util.pluginId() + " version " + Util.fullVersion());
+        refreshInstances();
+    }
+
     @Override
     public GoPluginApiResponse handle(GoPluginApiRequest request) throws UnhandledRequestTypeException {
         try {
             switch (Request.fromString(request.requestName())) {
+                case PLUGIN_SETTINGS_GET_ICON:
+                    return new GetPluginSettingsIconExecutor().execute();
+
                 case REQUEST_SHOULD_ASSIGN_WORK:
-                    refreshInstances();
                     return ShouldAssignWorkRequest.fromJSON(request.requestBody()).executor(agentInstances).execute();
                 case REQUEST_CREATE_AGENT:
-                    refreshInstances();
                     return CreateAgentRequest.fromJSON(request.requestBody()).executor(agentInstances, pluginRequest).execute();
                 case REQUEST_SERVER_PING:
-                    refreshInstances();
                     return new ServerPingRequestExecutor(agentInstances, pluginRequest).execute();
                 case PLUGIN_SETTINGS_GET_VIEW:
                     return new GetViewRequestExecutor().execute();
@@ -67,8 +77,6 @@ public class KubernetesPlugin implements GoPlugin {
                     return new GetProfileViewExecutor().execute();
                 case REQUEST_VALIDATE_PROFILE:
                     return ProfileValidateRequest.fromJSON(request.requestBody()).executor().execute();
-                case PLUGIN_SETTINGS_GET_ICON:
-                    return new GetPluginSettingsIconExecutor().execute();
                 case PLUGIN_SETTINGS_GET_CONFIGURATION:
                     return new GetPluginConfigurationExecutor().execute();
                 case PLUGIN_SETTINGS_VALIDATE_CONFIGURATION:
@@ -78,7 +86,7 @@ public class KubernetesPlugin implements GoPlugin {
             }
         } catch (Exception e) {
             LOG.error("Failed to handle request " + request.requestName(), e);
-            throw new RuntimeException(e);
+            return DefaultGoPluginApiResponse.error("Failed to handle request " + request.requestName());
         }
     }
 

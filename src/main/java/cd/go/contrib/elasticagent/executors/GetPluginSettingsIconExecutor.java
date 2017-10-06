@@ -18,11 +18,12 @@ package cd.go.contrib.elasticagent.executors;
 
 import cd.go.contrib.elasticagent.RequestExecutor;
 import cd.go.contrib.elasticagent.utils.Util;
-import com.google.common.io.BaseEncoding;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.thoughtworks.go.plugin.api.response.DefaultGoPluginApiResponse;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
+
+import java.util.Base64;
 
 public class GetPluginSettingsIconExecutor implements RequestExecutor {
     private static final Gson GSON = new Gson();
@@ -31,9 +32,7 @@ public class GetPluginSettingsIconExecutor implements RequestExecutor {
     public GoPluginApiResponse execute() throws Exception {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("content_type", "image/svg+xml");
-        jsonObject.addProperty("data", BaseEncoding.base64().encode(Util.readResourceBytes("/kubernetes_logo.svg")));
-        DefaultGoPluginApiResponse defaultGoPluginApiResponse = new DefaultGoPluginApiResponse(200, GSON.toJson(jsonObject));
-        return defaultGoPluginApiResponse;
-
+        jsonObject.addProperty("data", Base64.getEncoder().encodeToString(Util.readResourceBytes("/kubernetes_logo.svg")));
+        return DefaultGoPluginApiResponse.success(GSON.toJson(jsonObject));
     }
 }
