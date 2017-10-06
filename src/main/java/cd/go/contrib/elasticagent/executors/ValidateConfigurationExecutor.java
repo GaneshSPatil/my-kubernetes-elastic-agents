@@ -58,7 +58,7 @@ public class ValidateConfigurationExecutor implements RequestExecutor {
             if(StringUtils.isBlank(severInfo.getSecureSiteUrl())) {
                 HashMap<String, String> error = new HashMap<>();
                 error.put("key", "go_server_url");
-                error.put("message", "[Validate plugin settings] Secure site url is not configured. Please specify Go Server Url.");
+                error.put("message", "Secure site url is not configured. Please specify Go Server Url.");
                 result.add(error);
             }
         }

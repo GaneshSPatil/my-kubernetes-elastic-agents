@@ -50,12 +50,6 @@ public class KubernetesPlugin implements GoPlugin {
         agentInstances = new KubernetesAgentInstances();
     }
 
-    @Load
-    public void onLoad(PluginContext ctx) {
-        LOG.info("Loading plugin " + Util.pluginId() + " version " + Util.fullVersion());
-        refreshInstances();
-    }
-
     @Override
     public GoPluginApiResponse handle(GoPluginApiRequest request) throws UnhandledRequestTypeException {
         try {
@@ -70,18 +64,21 @@ public class KubernetesPlugin implements GoPlugin {
                     return new GetViewRequestExecutor().execute();
                 case PLUGIN_SETTINGS_VALIDATE_CONFIGURATION:
                     return ValidatePluginSettings.fromJSON(request.requestBody()).executor(pluginRequest).execute();
-
-                case REQUEST_SHOULD_ASSIGN_WORK:
-                    return ShouldAssignWorkRequest.fromJSON(request.requestBody()).executor(agentInstances).execute();
-                case REQUEST_CREATE_AGENT:
-                    return CreateAgentRequest.fromJSON(request.requestBody()).executor(agentInstances, pluginRequest).execute();
-                case REQUEST_SERVER_PING:
-                    return new ServerPingRequestExecutor(agentInstances, pluginRequest).execute();
-
                 case REQUEST_GET_PROFILE_METADATA:
                     return new GetProfileMetadataExecutor().execute();
                 case REQUEST_GET_PROFILE_VIEW:
                     return new GetProfileViewExecutor().execute();
+
+                case REQUEST_SHOULD_ASSIGN_WORK:
+                    refreshInstances();
+                    return ShouldAssignWorkRequest.fromJSON(request.requestBody()).executor(agentInstances).execute();
+                case REQUEST_CREATE_AGENT:
+                    refreshInstances();
+                    return CreateAgentRequest.fromJSON(request.requestBody()).executor(agentInstances, pluginRequest).execute();
+                case REQUEST_SERVER_PING:
+                    refreshInstances();
+                    return new ServerPingRequestExecutor(agentInstances, pluginRequest).execute();
+
                 case REQUEST_VALIDATE_PROFILE:
                     return ProfileValidateRequest.fromJSON(request.requestBody()).executor().execute();
 

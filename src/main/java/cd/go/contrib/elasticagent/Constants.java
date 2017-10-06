@@ -29,6 +29,7 @@ public interface Constants {
 
     // The extension point API version that this plugin understands
     String API_VERSION = "2.0";
+    String SERVER_INFO_API_VERSION = "1.0";
 
     // the identifier of this plugin
     GoPluginIdentifier PLUGIN_IDENTIFIER = new GoPluginIdentifier(EXTENSION_TYPE, Collections.singletonList(API_VERSION));

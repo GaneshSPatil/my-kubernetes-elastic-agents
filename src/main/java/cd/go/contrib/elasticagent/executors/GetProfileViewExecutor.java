@@ -30,8 +30,6 @@ public class GetProfileViewExecutor implements RequestExecutor {
     public GoPluginApiResponse execute() throws Exception {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("template", Util.readResource("/profile.template.html"));
-        DefaultGoPluginApiResponse defaultGoPluginApiResponse = new DefaultGoPluginApiResponse(200, GSON.toJson(jsonObject));
-        return defaultGoPluginApiResponse;
+        return DefaultGoPluginApiResponse.success(GSON.toJson(jsonObject));
     }
-
 }

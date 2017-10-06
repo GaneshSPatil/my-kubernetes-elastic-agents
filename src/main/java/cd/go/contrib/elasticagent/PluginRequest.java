@@ -25,6 +25,7 @@ import java.util.Collection;
 
 import static cd.go.contrib.elasticagent.Constants.API_VERSION;
 import static cd.go.contrib.elasticagent.Constants.PLUGIN_IDENTIFIER;
+import static cd.go.contrib.elasticagent.Constants.SERVER_INFO_API_VERSION;
 
 public class PluginRequest {
     private final GoApplicationAccessor accessor;
@@ -34,7 +35,7 @@ public class PluginRequest {
     }
 
     public ServerInfo getSeverInfo() throws ServerRequestFailedException {
-        DefaultGoApiRequest request = new DefaultGoApiRequest(Constants.REQUEST_SERVER_INFO, API_VERSION, PLUGIN_IDENTIFIER);
+        DefaultGoApiRequest request = new DefaultGoApiRequest(Constants.REQUEST_SERVER_INFO, SERVER_INFO_API_VERSION, PLUGIN_IDENTIFIER);
         GoApiResponse response = accessor.submit(request);
 
         if (response.responseCode() != 200) {

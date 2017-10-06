@@ -88,7 +88,7 @@ public class ValidateConfigurationExecutorTest {
         assertThat(response.responseCode(), is(200));
         JSONAssert.assertEquals("[" +
                 "  {\n" +
-                "    \"message\": \"[Validate plugin settings] Secure site url is not configured. Please specify Go Server Url.\",\n" +
+                "    \"message\": \"Secure site url is not configured. Please specify Go Server Url.\",\n" +
                 "    \"key\": \"go_server_url\"\n" +
                 "  }\n" +
                 "]", response.responseBody(), true);
