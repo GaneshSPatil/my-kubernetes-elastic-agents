@@ -20,6 +20,7 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import org.apache.commons.lang3.StringUtils;
 
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 
