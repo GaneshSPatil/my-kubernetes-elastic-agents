@@ -41,7 +41,20 @@ public class PluginSettings {
     @SerializedName("kubernetes_cluster_url")
     private String kubernetesClusterUrl;
 
+    @Expose
+    @SerializedName("kubernetes_cluster_username")
+    private String kubernetesClusterUsername;
+
+    @Expose
+    @SerializedName("kubernetes_cluster_password")
+    private String kubernetesClusterPassword;
+
+    @Expose
+    @SerializedName("kubernetes_cluster_ca_cert")
+    private String kubernetesClusterCACert;
+
     private Period autoRegisterPeriod;
+
 
     public static PluginSettings fromJSON(String json) {
         return GSON.fromJson(json, PluginSettings.class);
@@ -91,5 +104,17 @@ public class PluginSettings {
 
     public String getKubernetesClusterUrl() {
         return kubernetesClusterUrl;
+    }
+
+    public String getKubernetesClusterUsername() {
+        return kubernetesClusterUsername;
+    }
+
+    public String getKubernetesClusterPassword() {
+        return kubernetesClusterPassword;
+    }
+
+    public String getKubernetesClusterCACert() {
+        return kubernetesClusterCACert;
     }
 }

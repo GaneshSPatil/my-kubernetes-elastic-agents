@@ -50,7 +50,20 @@ public class KubernetesAgentInstances implements AgentInstances<KubernetesInstan
     }
 
     private KubernetesClient kubernetes(PluginSettings settings) {
-        Config build = new ConfigBuilder().withMasterUrl(settings.getKubernetesClusterUrl()).build();
+        ConfigBuilder configBuilder = new ConfigBuilder().withMasterUrl(settings.getKubernetesClusterUrl());
+        if(StringUtils.isNotBlank(settings.getKubernetesClusterUsername())) {
+            configBuilder.withUsername(settings.getKubernetesClusterUsername());
+        }
+
+        if(StringUtils.isNotBlank(settings.getKubernetesClusterPassword())) {
+            configBuilder.withPassword(settings.getKubernetesClusterPassword());
+        }
+
+        if(StringUtils.isNotBlank(settings.getKubernetesClusterCACert())) {
+            configBuilder.withCaCertData(settings.getKubernetesClusterCACert());
+        }
+
+        Config build = configBuilder.build();
         return new DefaultKubernetesClient(build);
     }
 
@@ -58,7 +71,7 @@ public class KubernetesAgentInstances implements AgentInstances<KubernetesInstan
     public void terminate(String agentId, PluginSettings settings) throws Exception {
         KubernetesInstance instance = instances.get(agentId);
         if (instance != null) {
-            instance.terminate(settings);
+            instance.terminate(kubernetes(settings));
         } else {
             LOG.warn("Requested to terminate an instance that does not exist " + agentId);
         }

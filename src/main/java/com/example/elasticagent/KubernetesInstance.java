@@ -123,7 +123,10 @@ public class KubernetesInstance {
     private static List<EnvVar> environmentFrom(CreateAgentRequest request, PluginSettings settings, String containerName) {
         ArrayList<EnvVar> env = new ArrayList<>();
         env.add(new EnvVar("GO_EA_SERVER_URL", settings.getGoServerUrl(), null));
-        env.addAll(parseEnvironments(request.properties().get("Environment")));
+        String environment = request.properties().get("Environment");
+        if(StringUtils.isNotBlank(environment)) {
+            env.addAll(parseEnvironments(environment));
+        }
         env.addAll(request.autoregisterPropertiesAsEnvironmentVars(containerName));
 
         return new ArrayList<>(env);
@@ -166,9 +169,7 @@ public class KubernetesInstance {
         return image;
     }
 
-    public void terminate(PluginSettings settings) {
-        Config build = new ConfigBuilder().withMasterUrl(settings.getKubernetesClusterUrl()).build();
-        KubernetesClient client = new DefaultKubernetesClient(build);
+    public void terminate(KubernetesClient client) {
         client.pods().inNamespace(KUBERNETES_NAMESPACE_KEY).withName(name).delete();
     }
 

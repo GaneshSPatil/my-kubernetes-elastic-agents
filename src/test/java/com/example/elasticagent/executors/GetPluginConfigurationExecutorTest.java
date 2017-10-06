@@ -63,6 +63,24 @@ public class GetPluginConfigurationExecutorTest {
                 "    \"required\": true,\n" +
                 "    \"secure\": false,\n" +
                 "    \"display-order\": \"2\"\n" +
+                "  },\n" +
+                "  \"kubernetes_cluster_username\": {\n" +
+                "    \"display-name\": \"Kubernetes Cluster Username\",\n" +
+                "    \"required\": false,\n" +
+                "    \"secure\": false,\n" +
+                "    \"display-order\": \"3\"\n" +
+                "  },\n" +
+                "  \"kubernetes_cluster_password\": {\n" +
+                "    \"display-name\": \"Kubernetes Cluster Password\",\n" +
+                "    \"required\": false,\n" +
+                "    \"secure\": true,\n" +
+                "    \"display-order\": \"4\"\n" +
+                "  },\n" +
+                "  \"kubernetes_cluster_ca_cert\": {\n" +
+                "    \"display-name\": \"Kubernetes Cluster CA Certificate\",\n" +
+                "    \"required\": false,\n" +
+                "    \"secure\": true,\n" +
+                "    \"display-order\": \"5\"\n" +
                 "  }\n" +
                 "}";
 
