@@ -16,10 +16,10 @@
 
 package cd.go.contrib.elasticagent.requests;
 
-import cd.go.contrib.elasticagent.PluginRequest;
-import cd.go.contrib.elasticagent.RequestExecutor;
 import cd.go.contrib.elasticagent.AgentInstances;
 import cd.go.contrib.elasticagent.Constants;
+import cd.go.contrib.elasticagent.PluginRequest;
+import cd.go.contrib.elasticagent.RequestExecutor;
 import cd.go.contrib.elasticagent.executors.CreateAgentRequestExecutor;
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
@@ -48,6 +48,10 @@ public class CreateAgentRequest {
         this.environment = environment;
     }
 
+    public static CreateAgentRequest fromJSON(String json) {
+        return GSON.fromJson(json, CreateAgentRequest.class);
+    }
+
     public String autoRegisterKey() {
         return autoRegisterKey;
     }
@@ -58,10 +62,6 @@ public class CreateAgentRequest {
 
     public String environment() {
         return environment;
-    }
-
-    public static CreateAgentRequest fromJSON(String json) {
-        return GSON.fromJson(json, CreateAgentRequest.class);
     }
 
     public RequestExecutor executor(AgentInstances agentInstances, PluginRequest pluginRequest) {

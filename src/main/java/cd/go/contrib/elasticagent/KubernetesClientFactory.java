@@ -23,10 +23,31 @@ import io.fabric8.kubernetes.client.KubernetesClient;
 import org.apache.commons.lang3.StringUtils;
 
 public class KubernetesClientFactory {
+    private static final KubernetesClientFactory KUBERNETES_CLIENT_FACTORY = new KubernetesClientFactory();
     private KubernetesClient client;
     private PluginSettings pluginSettings;
 
-    private static final KubernetesClientFactory KUBERNETES_CLIENT_FACTORY = new KubernetesClientFactory();
+    public static KubernetesClientFactory instance() {
+        return KUBERNETES_CLIENT_FACTORY;
+    }
+
+    private static KubernetesClient createClient(PluginSettings pluginSettings) throws Exception {
+        ConfigBuilder configBuilder = new ConfigBuilder().withMasterUrl(pluginSettings.getKubernetesClusterUrl());
+        if (StringUtils.isNotBlank(pluginSettings.getKubernetesClusterUsername())) {
+            configBuilder.withUsername(pluginSettings.getKubernetesClusterUsername());
+        }
+
+        if (StringUtils.isNotBlank(pluginSettings.getKubernetesClusterPassword())) {
+            configBuilder.withPassword(pluginSettings.getKubernetesClusterPassword());
+        }
+
+        if (StringUtils.isNotBlank(pluginSettings.getKubernetesClusterCACert())) {
+            configBuilder.withCaCertData(pluginSettings.getKubernetesClusterCACert());
+        }
+
+        Config build = configBuilder.build();
+        return new DefaultKubernetesClient(build);
+    }
 
     public synchronized KubernetesClient kubernetes(PluginSettings pluginSettings) throws Exception {
         if (pluginSettings.equals(this.pluginSettings) && this.client != null) {
@@ -36,27 +57,5 @@ public class KubernetesClientFactory {
         this.pluginSettings = pluginSettings;
         this.client = createClient(pluginSettings);
         return this.client;
-    }
-
-    public static KubernetesClientFactory instance() {
-        return KUBERNETES_CLIENT_FACTORY;
-    }
-
-    private static KubernetesClient createClient(PluginSettings pluginSettings) throws Exception {
-        ConfigBuilder configBuilder = new ConfigBuilder().withMasterUrl(pluginSettings.getKubernetesClusterUrl());
-        if(StringUtils.isNotBlank(pluginSettings.getKubernetesClusterUsername())) {
-            configBuilder.withUsername(pluginSettings.getKubernetesClusterUsername());
-        }
-
-        if(StringUtils.isNotBlank(pluginSettings.getKubernetesClusterPassword())) {
-            configBuilder.withPassword(pluginSettings.getKubernetesClusterPassword());
-        }
-
-        if(StringUtils.isNotBlank(pluginSettings.getKubernetesClusterCACert())) {
-            configBuilder.withCaCertData(pluginSettings.getKubernetesClusterCACert());
-        }
-
-        Config build = configBuilder.build();
-        return new DefaultKubernetesClient(build);
     }
 }

@@ -20,14 +20,14 @@ import org.joda.time.DateTime;
 import org.joda.time.Period;
 
 public interface Clock {
-    DateTime now();
-
     Clock DEFAULT = new Clock() {
         @Override
         public DateTime now() {
             return new DateTime();
         }
     };
+
+    DateTime now();
 
     class TestClock implements Clock {
 

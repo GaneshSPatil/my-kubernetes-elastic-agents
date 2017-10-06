@@ -17,8 +17,8 @@
 package cd.go.contrib.elasticagent.executors;
 
 import cd.go.contrib.elasticagent.AgentInstances;
-import cd.go.contrib.elasticagent.RequestExecutor;
 import cd.go.contrib.elasticagent.KubernetesInstance;
+import cd.go.contrib.elasticagent.RequestExecutor;
 import cd.go.contrib.elasticagent.requests.ShouldAssignWorkRequest;
 import com.thoughtworks.go.plugin.api.response.DefaultGoPluginApiResponse;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;

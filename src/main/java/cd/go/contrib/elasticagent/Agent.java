@@ -34,35 +34,18 @@ import java.util.List;
  */
 public class Agent {
 
-    public enum AgentState {
-        Idle, Building, LostContact, Missing, Unknown
-    }
-
-    public enum BuildState {
-        Idle, Building, Cancelled, Unknown
-    }
-
-    public enum ConfigState {
-        Pending, Enabled, Disabled
-    }
-
     public static final Type AGENT_METADATA_LIST_TYPE = new TypeToken<ArrayList<Agent>>() {
     }.getType();
-
     private static final Gson GSON = new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).create();
-
     @Expose
     @SerializedName("agent_id")
     private String agentId;
-
     @Expose
     @SerializedName("agent_state")
     private AgentState agentState;
-
     @Expose
     @SerializedName("build_state")
     private BuildState buildState;
-
     @Expose
     @SerializedName("config_state")
     private ConfigState configState;
@@ -79,6 +62,14 @@ public class Agent {
         this.configState = configState;
     }
 
+    public static List<Agent> fromJSONArray(String json) {
+        return GSON.fromJson(json, AGENT_METADATA_LIST_TYPE);
+    }
+
+    public static String toJSONArray(Collection<Agent> metadata) {
+        return new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).create().toJson(metadata);
+    }
+
     public String elasticAgentId() {
         return agentId;
     }
@@ -93,14 +84,6 @@ public class Agent {
 
     public ConfigState configState() {
         return configState;
-    }
-
-    public static List<Agent> fromJSONArray(String json) {
-        return GSON.fromJson(json, AGENT_METADATA_LIST_TYPE);
-    }
-
-    public static String toJSONArray(Collection<Agent> metadata) {
-        return new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).create().toJson(metadata);
     }
 
     @Override
@@ -134,5 +117,17 @@ public class Agent {
         result = 31 * result + (buildState != null ? buildState.hashCode() : 0);
         result = 31 * result + (configState != null ? configState.hashCode() : 0);
         return result;
+    }
+
+    public enum AgentState {
+        Idle, Building, LostContact, Missing, Unknown
+    }
+
+    public enum BuildState {
+        Idle, Building, Cancelled, Unknown
+    }
+
+    public enum ConfigState {
+        Pending, Enabled, Disabled
     }
 }

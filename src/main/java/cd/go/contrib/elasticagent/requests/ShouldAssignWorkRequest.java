@@ -45,6 +45,10 @@ public class ShouldAssignWorkRequest {
     public ShouldAssignWorkRequest() {
     }
 
+    public static ShouldAssignWorkRequest fromJSON(String json) {
+        return GSON.fromJson(json, ShouldAssignWorkRequest.class);
+    }
+
     public Agent agent() {
         return agent;
     }
@@ -55,10 +59,6 @@ public class ShouldAssignWorkRequest {
 
     public Map<String, String> properties() {
         return properties;
-    }
-
-    public static ShouldAssignWorkRequest fromJSON(String json) {
-        return GSON.fromJson(json, ShouldAssignWorkRequest.class);
     }
 
     public RequestExecutor executor(AgentInstances agentInstances) {

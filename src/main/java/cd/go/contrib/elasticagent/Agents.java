@@ -27,8 +27,6 @@ import java.util.*;
  */
 public class Agents {
 
-    private final Map<String, Agent> agents = new HashMap<>();
-
     // Filter for agents that can be disabled safely
     private static final Predicate<Agent> AGENT_IDLE_PREDICATE = new Predicate<Agent>() {
         @Override
@@ -37,7 +35,6 @@ public class Agents {
             return metadata.configState().equals(Agent.ConfigState.Enabled) && (agentState.equals(Agent.AgentState.Idle) || agentState.equals(Agent.AgentState.Missing) || agentState.equals(Agent.AgentState.LostContact));
         }
     };
-
     // Filter for agents that can be terminated safely
     private static final Predicate<Agent> AGENT_DISABLED_PREDICATE = new Predicate<Agent>() {
         @Override
@@ -46,6 +43,7 @@ public class Agents {
             return metadata.configState().equals(Agent.ConfigState.Disabled) && (agentState.equals(Agent.AgentState.Idle) || agentState.equals(Agent.AgentState.Missing) || agentState.equals(Agent.AgentState.LostContact));
         }
     };
+    private final Map<String, Agent> agents = new HashMap<>();
 
     public Agents() {
     }

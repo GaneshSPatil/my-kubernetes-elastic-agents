@@ -17,8 +17,8 @@
 package cd.go.contrib.elasticagent;
 
 import cd.go.contrib.elasticagent.executors.*;
-import cd.go.contrib.elasticagent.requests.ProfileValidateRequest;
 import cd.go.contrib.elasticagent.requests.CreateAgentRequest;
+import cd.go.contrib.elasticagent.requests.ProfileValidateRequest;
 import cd.go.contrib.elasticagent.requests.ShouldAssignWorkRequest;
 import cd.go.contrib.elasticagent.requests.ValidatePluginSettings;
 import com.thoughtworks.go.plugin.api.GoApplicationAccessor;

@@ -54,6 +54,13 @@ public class Size implements Comparable<Size> {
             .put("terabyte", SizeUnit.TERABYTES)
             .put("terabytes", SizeUnit.TERABYTES)
             .build();
+    private final long count;
+    private final SizeUnit unit;
+
+    private Size(long count, SizeUnit unit) {
+        this.count = count;
+        this.unit = requireNonNull(unit);
+    }
 
     public static Size bytes(long count) {
         return new Size(count, SizeUnit.BYTES);
@@ -86,14 +93,6 @@ public class Size implements Comparable<Size> {
         }
 
         return new Size(count, unit);
-    }
-
-    private final long count;
-    private final SizeUnit unit;
-
-    private Size(long count, SizeUnit unit) {
-        this.count = count;
-        this.unit = requireNonNull(unit);
     }
 
     public long getQuantity() {

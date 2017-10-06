@@ -26,14 +26,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GetProfileMetadataExecutor implements RequestExecutor {
-    private static final Gson GSON = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
-
     public static final Metadata IMAGE = new Metadata("Image", true, false);
     public static final Metadata MAX_MEMORY = new MemoryMetadata("MaxMemory", false);
     public static final Metadata MAX_CPU = new Metadata("MaxCPU", false, false);
     public static final Metadata ENVIRONMENT = new Metadata("Environment", false, false);
-
     public static final List<Metadata> FIELDS = new ArrayList<>();
+    private static final Gson GSON = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
 
     static {
         FIELDS.add(IMAGE);

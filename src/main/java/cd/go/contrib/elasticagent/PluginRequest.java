@@ -41,7 +41,7 @@ public class PluginRequest {
         }
 
         final PluginSettings pluginSettings = PluginSettings.fromJSON(response.responseBody());
-        if(pluginSettings == null){
+        if (pluginSettings == null) {
             throw new PluginSettingsNotConfiguredException();
         }
         return pluginSettings;

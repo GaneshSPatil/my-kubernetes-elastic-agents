@@ -32,9 +32,8 @@ import java.util.concurrent.ConcurrentHashMap;
 public class KubernetesAgentInstances implements AgentInstances<KubernetesInstance> {
     public static final Logger LOG = Logger.getLoggerFor(KubernetesAgentInstances.class);
     private final ConcurrentHashMap<String, KubernetesInstance> instances = new ConcurrentHashMap<>();
-
-    private boolean refreshed;
     public Clock clock = Clock.DEFAULT;
+    private boolean refreshed;
     private KubernetesClientFactory factory;
 
     public KubernetesAgentInstances() {

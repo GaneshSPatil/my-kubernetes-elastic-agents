@@ -27,16 +27,14 @@ import java.util.Map;
 
 public class GetPluginConfigurationExecutor implements RequestExecutor {
 
-    private static final Gson GSON = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
-
     public static final Field GO_SERVER_URL = new NonBlankField("go_server_url", "Go Server URL", null, true, false, "0");
     public static final Field AUTOREGISTER_TIMEOUT = new PositiveNumberField("auto_register_timeout", "Agent auto-register Timeout (in minutes)", "10", true, false, "1");
     public static final Field KUBERNETES_CLUSTER_URL = new NonBlankField("kubernetes_cluster_url", "Kubernetes Cluster URL", null, true, false, "2");
     public static final Field KUBERNETES_CLUSTER_USERNAME = new Field("kubernetes_cluster_username", "Kubernetes Cluster Username", null, false, false, "3");
     public static final Field KUBERNETES_CLUSTER_PASSWORD = new Field("kubernetes_cluster_password", "Kubernetes Cluster Password", null, false, true, "4");
     public static final Field KUBERNETES_CLUSTER_CA_CERT = new Field("kubernetes_cluster_ca_cert", "Kubernetes Cluster CA Certificate", null, false, true, "5");
-
     public static final Map<String, Field> FIELDS = new LinkedHashMap<>();
+    private static final Gson GSON = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
 
     static {
         FIELDS.put(GO_SERVER_URL.key(), GO_SERVER_URL);

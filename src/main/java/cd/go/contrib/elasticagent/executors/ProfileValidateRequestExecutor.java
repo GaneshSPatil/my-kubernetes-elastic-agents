@@ -25,8 +25,8 @@ import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
 import java.util.*;
 
 public class ProfileValidateRequestExecutor implements RequestExecutor {
-    private final ProfileValidateRequest request;
     private static final Gson GSON = new Gson();
+    private final ProfileValidateRequest request;
 
     public ProfileValidateRequestExecutor(ProfileValidateRequest request) {
         this.request = request;

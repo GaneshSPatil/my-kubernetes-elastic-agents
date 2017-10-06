@@ -31,13 +31,12 @@ public class ProfileValidateRequest {
         this.properties = properties;
     }
 
+    public static ProfileValidateRequest fromJSON(String json) {
+        return new ProfileValidateRequest(GSON.fromJson(json, Map.class));
+    }
 
     public Map<String, String> getProperties() {
         return properties;
-    }
-
-    public static ProfileValidateRequest fromJSON(String json) {
-        return new ProfileValidateRequest(GSON.fromJson(json, Map.class));
     }
 
     public RequestExecutor executor() {

@@ -40,33 +40,6 @@ public class KubernetesInstance {
         this.properties = properties;
     }
 
-    public String name() {
-        return name;
-    }
-
-    public DateTime createdAt() {
-        return createdAt;
-    }
-
-    public String environment() {
-        return environment;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        KubernetesInstance that = (KubernetesInstance) o;
-
-        return name != null ? name.equals(that.name) : that.name == null;
-    }
-
-    @Override
-    public int hashCode() {
-        return name != null ? name.hashCode() : 0;
-    }
-
     public static KubernetesInstance create(CreateAgentRequest request, PluginSettings settings, KubernetesClient client) {
         String containerName = Constants.KUBERNETES_POD_NAME + UUID.randomUUID().toString();
         Date createdAt = new Date();
@@ -78,15 +51,15 @@ public class KubernetesInstance {
         container.setImagePullPolicy("IfNotPresent");
 
         ResourceRequirements resources = new ResourceRequirements();
-        resources.setLimits(new HashMap<String, Quantity>(){{
+        resources.setLimits(new HashMap<String, Quantity>() {{
             String maxMemory = request.properties().get("MaxMemory");
-            if(StringUtils.isNotBlank(maxMemory)) {
+            if (StringUtils.isNotBlank(maxMemory)) {
                 Size mem = Size.parse(maxMemory);
                 put("memory", new Quantity(String.valueOf(mem.toMegabytes()), "Mi"));
             }
 
             String maxCPU = request.properties().get("MaxCPU");
-            if(StringUtils.isNotBlank(maxCPU)) {
+            if (StringUtils.isNotBlank(maxCPU)) {
                 put("cpu", new Quantity(maxCPU));
             }
         }});
@@ -99,7 +72,9 @@ public class KubernetesInstance {
         podMetadata.setName(containerName);
 
         PodSpec podSpec = new PodSpec();
-        podSpec.setContainers(new ArrayList<Container>(){{ add(container); }});
+        podSpec.setContainers(new ArrayList<Container>() {{
+            add(container);
+        }});
         PodStatus podStatus = new PodStatus();
         Pod elasticAgentPod = new Pod("v1", "Pod", podMetadata, podSpec, podStatus);
 
@@ -120,7 +95,7 @@ public class KubernetesInstance {
         ArrayList<EnvVar> env = new ArrayList<>();
         env.add(new EnvVar("GO_EA_SERVER_URL", settings.getGoServerUrl(), null));
         String environment = request.properties().get("Environment");
-        if(StringUtils.isNotBlank(environment)) {
+        if (StringUtils.isNotBlank(environment)) {
             env.addAll(parseEnvironments(environment));
         }
         env.addAll(request.autoregisterPropertiesAsEnvironmentVars(containerName));
@@ -163,6 +138,33 @@ public class KubernetesInstance {
             return image + ":latest";
         }
         return image;
+    }
+
+    public String name() {
+        return name;
+    }
+
+    public DateTime createdAt() {
+        return createdAt;
+    }
+
+    public String environment() {
+        return environment;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        KubernetesInstance that = (KubernetesInstance) o;
+
+        return name != null ? name.equals(that.name) : that.name == null;
+    }
+
+    @Override
+    public int hashCode() {
+        return name != null ? name.hashCode() : 0;
     }
 
     public void terminate(KubernetesClient client) {

@@ -17,7 +17,6 @@
 package cd.go.contrib.elasticagent.executors;
 
 import cd.go.contrib.elasticagent.*;
-
 import cd.go.contrib.elasticagent.requests.CreateAgentRequest;
 import cd.go.contrib.elasticagent.requests.ShouldAssignWorkRequest;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
@@ -45,13 +44,12 @@ import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 public class ShouldAssignWorkRequestExecutorTest extends BaseTest {
-    private AgentInstances<KubernetesInstance> agentInstances;
-    private KubernetesInstance instance;
     private final String environment = "production";
-    private Map<String, String> properties = new HashMap<>();
-
     @Mock
     KubernetesClientFactory factory;
+    private AgentInstances<KubernetesInstance> agentInstances;
+    private KubernetesInstance instance;
+    private Map<String, String> properties = new HashMap<>();
     @Mock
     private KubernetesClient mockedClient;
     @Mock
