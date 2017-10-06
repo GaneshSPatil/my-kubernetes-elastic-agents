@@ -31,6 +31,7 @@ public class GetProfileMetadataExecutor implements RequestExecutor {
     public static final Metadata IMAGE = new Metadata("Image", true, false);
     public static final Metadata MAX_MEMORY = new MemoryMetadata("MaxMemory", false);
     public static final Metadata MAX_CPU = new Metadata("MaxCPU", false, false);
+    public static final Metadata ENVIRONMENT = new Metadata("Environment", false, false);
 
     public static final List<Metadata> FIELDS = new ArrayList<>();
 
@@ -38,6 +39,7 @@ public class GetProfileMetadataExecutor implements RequestExecutor {
         FIELDS.add(IMAGE);
         FIELDS.add(MAX_MEMORY);
         FIELDS.add(MAX_CPU);
+        FIELDS.add(ENVIRONMENT);
     }
 
     @Override

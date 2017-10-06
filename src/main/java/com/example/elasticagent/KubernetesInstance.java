@@ -84,13 +84,14 @@ public class KubernetesInstance {
         ResourceRequirements resources = new ResourceRequirements();
         resources.setLimits(new HashMap<String, Quantity>(){{
             String maxMemory = request.properties().get("MaxMemory");
-            if(!maxMemory.equals("")) {
+            if(StringUtils.isNotBlank(maxMemory)) {
                 Size mem = Size.parse(maxMemory);
                 put("memory", new Quantity(String.valueOf(mem.toMegabytes()), "Mi"));
             }
 
-            if(!request.properties().get("MaxCPU").equals("")) {
-                put("cpu", new Quantity(request.properties().get("MaxCPU")));
+            String maxCPU = request.properties().get("MaxCPU");
+            if(StringUtils.isNotBlank(maxCPU)) {
+                put("cpu", new Quantity(maxCPU));
             }
         }});
         container.setResources(resources);
@@ -122,9 +123,20 @@ public class KubernetesInstance {
     private static List<EnvVar> environmentFrom(CreateAgentRequest request, PluginSettings settings, String containerName) {
         ArrayList<EnvVar> env = new ArrayList<>();
         env.add(new EnvVar("GO_EA_SERVER_URL", settings.getGoServerUrl(), null));
+        env.addAll(parseEnvironments(request.properties().get("Environment")));
         env.addAll(request.autoregisterPropertiesAsEnvironmentVars(containerName));
 
         return new ArrayList<>(env);
+    }
+
+    private static Collection<? extends EnvVar> parseEnvironments(String environment) {
+        ArrayList<EnvVar> envVars = new ArrayList<>();
+        for (String env : environment.split("\n")) {
+            String[] parts = env.split("=");
+            envVars.add(new EnvVar(parts[0], parts[1], null));
+        }
+
+        return envVars;
     }
 
     private static HashMap<String, String> labelsFrom(CreateAgentRequest request, Date createdAt) {
