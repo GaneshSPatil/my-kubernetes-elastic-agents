@@ -30,7 +30,7 @@ public class GetViewRequestExecutor implements RequestExecutor {
     public GoPluginApiResponse execute() throws Exception {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("template", Util.readResource("/plugin-settings.template.html"));
-        DefaultGoPluginApiResponse defaultGoPluginApiResponse = new DefaultGoPluginApiResponse(200, GSON.toJson(jsonObject));
+        DefaultGoPluginApiResponse defaultGoPluginApiResponse = DefaultGoPluginApiResponse.success(GSON.toJson(jsonObject));
         return defaultGoPluginApiResponse;
     }
 }

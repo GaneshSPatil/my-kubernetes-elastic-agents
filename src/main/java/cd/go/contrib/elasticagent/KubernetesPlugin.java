@@ -66,6 +66,8 @@ public class KubernetesPlugin implements GoPlugin {
                     return new GetPluginSettingsIconExecutor().execute();
                 case PLUGIN_SETTINGS_GET_CONFIGURATION:
                     return new GetPluginConfigurationExecutor().execute();
+                case PLUGIN_SETTINGS_GET_VIEW:
+                    return new GetViewRequestExecutor().execute();
 
                 case REQUEST_SHOULD_ASSIGN_WORK:
                     return ShouldAssignWorkRequest.fromJSON(request.requestBody()).executor(agentInstances).execute();
@@ -73,8 +75,7 @@ public class KubernetesPlugin implements GoPlugin {
                     return CreateAgentRequest.fromJSON(request.requestBody()).executor(agentInstances, pluginRequest).execute();
                 case REQUEST_SERVER_PING:
                     return new ServerPingRequestExecutor(agentInstances, pluginRequest).execute();
-                case PLUGIN_SETTINGS_GET_VIEW:
-                    return new GetViewRequestExecutor().execute();
+
                 case REQUEST_GET_PROFILE_METADATA:
                     return new GetProfileMetadataExecutor().execute();
                 case REQUEST_GET_PROFILE_VIEW:
