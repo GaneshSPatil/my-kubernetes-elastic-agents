@@ -36,10 +36,13 @@ public class GoServerUrlField extends SecureURLField {
         try {
             URI uri = new URI(input);
             if (uri.getHost().equalsIgnoreCase("localhost") || uri.getHost().equalsIgnoreCase("127.0.0.1")) {
-                return this.displayName + " must not be localhost, since this gets resolved on the agents";
+                return this.displayName + " must not be localhost, since this gets resolved on the agents.";
+            }
+            if (!StringUtils.endsWith(input, "/go")) {
+                return this.displayName + " must be in format https://<GO_SERVER_URL>:<GO_SERVER_PORT>/go.";
             }
         } catch (URISyntaxException e) {
-            return this.displayName + " must be a valid URL (https://example.com:8154/go)";
+            return this.displayName + " must be a valid URL (https://example.com:8154/go).";
         }
 
         return null;

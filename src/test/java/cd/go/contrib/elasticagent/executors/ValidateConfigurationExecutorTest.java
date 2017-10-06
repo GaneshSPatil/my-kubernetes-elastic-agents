@@ -93,4 +93,38 @@ public class ValidateConfigurationExecutorTest {
                 "  }\n" +
                 "]", response.responseBody(), true);
     }
+
+    @Test
+    public void shouldValidateGoServerHTTPSUrlFormat() throws Exception {
+        ValidatePluginSettings settings = new ValidatePluginSettings();
+        settings.put("go_server_url", "foo.com");
+        settings.put("kubernetes_cluster_url", "https://cluster.example.com");
+        settings.put("auto_register_timeout", "10");
+        GoPluginApiResponse response = new ValidateConfigurationExecutor(settings, pluginRequest).execute();
+
+        assertThat(response.responseCode(), is(200));
+        JSONAssert.assertEquals("[" +
+                "  {\n" +
+                "    \"message\": \"Go Server URL must be a valid HTTPs URL (https://example.com).\",\n" +
+                "    \"key\": \"go_server_url\"\n" +
+                "  }\n" +
+                "]", response.responseBody(), true);
+    }
+
+    @Test
+    public void shouldValidateGoServerUrlFormat() throws Exception {
+        ValidatePluginSettings settings = new ValidatePluginSettings();
+        settings.put("go_server_url", "https://foo.com");
+        settings.put("kubernetes_cluster_url", "https://cluster.example.com");
+        settings.put("auto_register_timeout", "10");
+        GoPluginApiResponse response = new ValidateConfigurationExecutor(settings, pluginRequest).execute();
+
+        assertThat(response.responseCode(), is(200));
+        JSONAssert.assertEquals("[" +
+                "  {\n" +
+                "    \"message\": \"Go Server URL must be in format https://<GO_SERVER_URL>:<GO_SERVER_PORT>/go.\",\n" +
+                "    \"key\": \"go_server_url\"\n" +
+                "  }\n" +
+                "]", response.responseBody(), true);
+    }
 }

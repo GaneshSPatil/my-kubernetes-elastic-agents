@@ -19,7 +19,6 @@ package cd.go.contrib.elasticagent.executors;
 import org.apache.commons.lang3.StringUtils;
 
 import java.net.URI;
-import java.net.URISyntaxException;
 
 public class SecureURLField extends Field {
 
