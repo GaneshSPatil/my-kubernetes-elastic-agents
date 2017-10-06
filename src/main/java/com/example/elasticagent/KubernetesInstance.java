@@ -159,4 +159,8 @@ public class KubernetesInstance {
         KubernetesClient client = new DefaultKubernetesClient(build);
         client.pods().inNamespace(KUBERNETES_NAMESPACE_KEY).withName(name).delete();
     }
+
+    public Map<String, String> getInstanceProperties() {
+        return properties;
+    }
 }

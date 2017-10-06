@@ -48,9 +48,9 @@ public class ShouldAssignWorkRequestExecutor implements RequestExecutor {
 
         boolean environmentMatches = stripToEmpty(request.environment()).equalsIgnoreCase(stripToEmpty(instance.environment()));
 
-        Map<String, String> containerProperties = agentInstances.getInstanceProperties(instance.name()) == null ? new HashMap<String, String>() : agentInstances.getInstanceProperties(instance.name());
 
-        Map<String, String> requestProperties = request.properties() == null ? new HashMap<String, String>() : request.properties();
+        Map<String, String> containerProperties = instance.getInstanceProperties() == null ? new HashMap<>() : instance.getInstanceProperties();
+        Map<String, String> requestProperties = request.properties() == null ? new HashMap<>() : request.properties();
 
         boolean propertiesMatch = requestProperties.equals(containerProperties);
 
