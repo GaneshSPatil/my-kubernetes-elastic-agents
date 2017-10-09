@@ -16,6 +16,7 @@
 
 package cd.go.contrib.elasticagent.executors;
 
+import cd.go.contrib.elasticagent.model.Field;
 import cd.go.contrib.elasticagent.utils.Util;
 import com.google.gson.Gson;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;

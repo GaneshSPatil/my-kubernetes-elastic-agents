@@ -17,6 +17,10 @@
 package cd.go.contrib.elasticagent.executors;
 
 import cd.go.contrib.elasticagent.RequestExecutor;
+import cd.go.contrib.elasticagent.model.Field;
+import cd.go.contrib.elasticagent.model.GoServerUrlField;
+import cd.go.contrib.elasticagent.model.PositiveNumberField;
+import cd.go.contrib.elasticagent.model.SecureURLField;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.thoughtworks.go.plugin.api.response.DefaultGoPluginApiResponse;

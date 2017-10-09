@@ -19,6 +19,7 @@ package cd.go.contrib.elasticagent.executors;
 import cd.go.contrib.elasticagent.PluginRequest;
 import cd.go.contrib.elasticagent.RequestExecutor;
 import cd.go.contrib.elasticagent.ServerRequestFailedException;
+import cd.go.contrib.elasticagent.model.Field;
 import cd.go.contrib.elasticagent.model.ServerInfo;
 import cd.go.contrib.elasticagent.requests.ValidatePluginSettings;
 import com.google.gson.Gson;

@@ -16,6 +16,7 @@
 
 package cd.go.contrib.elasticagent.executors;
 
+import cd.go.contrib.elasticagent.model.MemoryMetadata;
 import org.junit.Test;
 
 import java.util.Map;

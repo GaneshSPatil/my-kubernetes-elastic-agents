@@ -17,6 +17,8 @@
 package cd.go.contrib.elasticagent.executors;
 
 import cd.go.contrib.elasticagent.RequestExecutor;
+import cd.go.contrib.elasticagent.model.MemoryMetadata;
+import cd.go.contrib.elasticagent.model.Metadata;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.thoughtworks.go.plugin.api.response.DefaultGoPluginApiResponse;

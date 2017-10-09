@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package cd.go.contrib.elasticagent.executors;
+package cd.go.contrib.elasticagent.model;
 
 import org.apache.commons.lang3.StringUtils;
 

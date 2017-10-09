@@ -14,22 +14,23 @@
  * limitations under the License.
  */
 
-package cd.go.contrib.elasticagent.executors;
+package cd.go.contrib.elasticagent.model;
 
-import org.apache.commons.lang3.StringUtils;
-
-public class NonBlankField extends Field {
-
-    public NonBlankField(String key, String displayName, String defaultValue, Boolean secure, String displayOrder) {
-        super(key, displayName, defaultValue, true, secure, displayOrder);
+public class PositiveNumberField extends Field {
+    public PositiveNumberField(String key, String displayName, String defaultValue, Boolean required, Boolean secure, String displayOrder) {
+        super(key, displayName, defaultValue, required, secure, displayOrder);
     }
 
     @Override
     public String doValidate(String input) {
-        if (StringUtils.isBlank(input)) {
-            return this.displayName + " must not be blank.";
+        try {
+            if (Integer.parseInt(input) <= 0) {
+                return this.displayName + " must be a positive integer.";
+            }
+        } catch (NumberFormatException e) {
+            return this.displayName + " must be a positive integer.";
         }
+
         return null;
     }
-
 }

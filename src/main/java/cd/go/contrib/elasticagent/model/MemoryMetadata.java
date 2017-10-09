@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package cd.go.contrib.elasticagent.executors;
+package cd.go.contrib.elasticagent.model;
 
 
 import cd.go.contrib.elasticagent.utils.Size;

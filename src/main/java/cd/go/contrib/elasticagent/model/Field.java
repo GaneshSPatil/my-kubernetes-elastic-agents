@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package cd.go.contrib.elasticagent.executors;
+package cd.go.contrib.elasticagent.model;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
@@ -23,35 +23,42 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-
-public class Metadata {
-
-    @Expose
-    @SerializedName("key")
-    private String key;
+public class Field {
+    protected final String key;
 
     @Expose
-    @SerializedName("metadata")
-    private ProfileMetadata metadata;
+    @SerializedName("display-name")
+    protected String displayName;
 
-    public Metadata(String key, boolean required, boolean secure) {
-        this(key, new ProfileMetadata(required, secure));
-    }
+    @Expose
+    @SerializedName("default-value")
+    protected String defaultValue;
 
-    public Metadata(String key) {
-        this(key, new ProfileMetadata(false, false));
-    }
+    @Expose
+    @SerializedName("required")
+    protected Boolean required;
 
-    public Metadata(String key, ProfileMetadata metadata) {
+    @Expose
+    @SerializedName("secure")
+    protected Boolean secure;
+
+    @Expose
+    @SerializedName("display-order")
+    protected String displayOrder;
+
+    public Field(String key, String displayName, String defaultValue, Boolean required, Boolean secure, String displayOrder) {
         this.key = key;
-        this.metadata = metadata;
+        this.displayName = displayName;
+        this.defaultValue = defaultValue;
+        this.required = required;
+        this.secure = secure;
+        this.displayOrder = displayOrder;
     }
 
     public Map<String, String> validate(String input) {
         HashMap<String, String> result = new HashMap<>();
         String validationError = doValidate(input);
-        if (isNotBlank(validationError)) {
+        if (StringUtils.isNotBlank(validationError)) {
             result.put("key", key);
             result.put("message", validationError);
         }
@@ -59,35 +66,10 @@ public class Metadata {
     }
 
     protected String doValidate(String input) {
-        if (isRequired()) {
-            if (StringUtils.isBlank(input)) {
-                return this.key + " must not be blank.";
-            }
-        }
         return null;
     }
 
-
-    public String getKey() {
+    public String key() {
         return key;
-    }
-
-    public boolean isRequired() {
-        return metadata.required;
-    }
-
-    public static class ProfileMetadata {
-        @Expose
-        @SerializedName("required")
-        private Boolean required;
-
-        @Expose
-        @SerializedName("secure")
-        private Boolean secure;
-
-        public ProfileMetadata(boolean required, boolean secure) {
-            this.required = required;
-            this.secure = secure;
-        }
     }
 }
