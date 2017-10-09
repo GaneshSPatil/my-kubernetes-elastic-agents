@@ -28,7 +28,7 @@ on Windows.
 
 1. Login to `GoCD server` as admin and navigate to **_Admin_** _>_ **_Elastic Agent Profiles_**
 
-![Elastic Profiles][3]
+![Elastic Profiles][2]
 
 2. Click on **_Add_** to create new elastic agent profile
     1. Specify `id` for profile.
@@ -39,23 +39,23 @@ on Windows.
     6. Optionally specify Environment Variables. These variables are passed to the container for use.
     7. Save your profile.
     
-![Create elastic profile][4]    
+![Create elastic profile][3]    
 
 ### Configure job to use an elastic agent profile
 
 1. Click the gear icon on **_Pipeline_**
 
-![Pipeline][5]
+![Pipeline][4]
 
 2. Click on **_Quick Edit_** button
 
-![Quick edit][6]
+![Quick edit][5]
 
 3. Click on **_Stages_**
 4. Create/Edit a job
 5. Enter the `unique id` of an elastic profile in Job Settings
 
-![Configure a job][7]
+![Configure a job][6]
 
 6. Save your changes
 
@@ -75,3 +75,8 @@ $ GO_SERVER_SYSTEM_PROPERTIES="-Dplugin.cd.go.contrib.elasticagent.kubernetes.lo
 
 
 [1]: images/plugin_settings.png     "Kubernetes Plugin settings"
+[2]: images/profiles_page.png  "Elastic profiles"
+[3]: images/profile.png "Create elastic profile"
+[4]: images/pipeline.png  "Pipeline"
+[5]: images/quick-edit.png  "Quick edit"
+[6]: images/configure-job.png  "Configure a job"

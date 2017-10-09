@@ -4,7 +4,7 @@ Kubernetes Elastic Agent Plugin provides production grade support to run GoCD El
 
 # Installation
 
-Documentation for installation is available [here](INSTALL.md)
+Documentation for installation is available [here](install.md)
 
 ## Building the code base
 
