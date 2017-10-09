@@ -25,9 +25,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.Period;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
+import static cd.go.contrib.elasticagent.Constants.KUBERNETES_POD_CREATION_TIME_FORMAT;
 
 public class KubernetesAgentInstances implements AgentInstances<KubernetesInstance> {
     public static final Logger LOG = Logger.getLoggerFor(KubernetesAgentInstances.class);
@@ -137,8 +141,9 @@ public class KubernetesAgentInstances implements AgentInstances<KubernetesInstan
             }
             Pod pod = client.pods().inNamespace(Constants.KUBERNETES_NAMESPACE_KEY).withName(instanceName).get();
 
-            String createdAt = pod.getMetadata().getLabels().get(Constants.POD_CREATED_AT_LABEL_KEY);
-            DateTime dateTimeCreated = new DateTime(Long.valueOf(createdAt));
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat(KUBERNETES_POD_CREATION_TIME_FORMAT);
+            Date createdAt = simpleDateFormat.parse(pod.getMetadata().getCreationTimestamp());
+            DateTime dateTimeCreated = new DateTime(createdAt);
 
             if (clock.now().isAfter(dateTimeCreated.plus(period))) {
                 unregisteredContainers.register(KubernetesInstance.fromInstanceInfo(pod));

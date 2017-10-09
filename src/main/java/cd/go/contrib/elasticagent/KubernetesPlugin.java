@@ -21,14 +21,11 @@ import cd.go.contrib.elasticagent.requests.CreateAgentRequest;
 import cd.go.contrib.elasticagent.requests.ProfileValidateRequest;
 import cd.go.contrib.elasticagent.requests.ShouldAssignWorkRequest;
 import cd.go.contrib.elasticagent.requests.ValidatePluginSettings;
-import cd.go.contrib.elasticagent.utils.Util;
 import com.thoughtworks.go.plugin.api.GoApplicationAccessor;
 import com.thoughtworks.go.plugin.api.GoPlugin;
 import com.thoughtworks.go.plugin.api.GoPluginIdentifier;
 import com.thoughtworks.go.plugin.api.annotation.Extension;
-import com.thoughtworks.go.plugin.api.annotation.Load;
 import com.thoughtworks.go.plugin.api.exceptions.UnhandledRequestTypeException;
-import com.thoughtworks.go.plugin.api.info.PluginContext;
 import com.thoughtworks.go.plugin.api.logging.Logger;
 import com.thoughtworks.go.plugin.api.request.GoPluginApiRequest;
 import com.thoughtworks.go.plugin.api.response.DefaultGoPluginApiResponse;
@@ -68,21 +65,17 @@ public class KubernetesPlugin implements GoPlugin {
                     return new GetProfileMetadataExecutor().execute();
                 case REQUEST_GET_PROFILE_VIEW:
                     return new GetProfileViewExecutor().execute();
-
-                case REQUEST_SHOULD_ASSIGN_WORK:
-                    refreshInstances();
-                    return ShouldAssignWorkRequest.fromJSON(request.requestBody()).executor(agentInstances).execute();
+                case REQUEST_VALIDATE_PROFILE:
+                    return ProfileValidateRequest.fromJSON(request.requestBody()).executor().execute();
                 case REQUEST_CREATE_AGENT:
                     refreshInstances();
                     return CreateAgentRequest.fromJSON(request.requestBody()).executor(agentInstances, pluginRequest).execute();
+                case REQUEST_SHOULD_ASSIGN_WORK:
+                    refreshInstances();
+                    return ShouldAssignWorkRequest.fromJSON(request.requestBody()).executor(agentInstances).execute();
                 case REQUEST_SERVER_PING:
                     refreshInstances();
                     return new ServerPingRequestExecutor(agentInstances, pluginRequest).execute();
-
-                case REQUEST_VALIDATE_PROFILE:
-                    return ProfileValidateRequest.fromJSON(request.requestBody()).executor().execute();
-
-
 
                 default:
                     throw new UnhandledRequestTypeException(request.requestName());

@@ -23,9 +23,7 @@ import com.thoughtworks.go.plugin.api.response.GoApiResponse;
 
 import java.util.Collection;
 
-import static cd.go.contrib.elasticagent.Constants.API_VERSION;
-import static cd.go.contrib.elasticagent.Constants.PLUGIN_IDENTIFIER;
-import static cd.go.contrib.elasticagent.Constants.SERVER_INFO_API_VERSION;
+import static cd.go.contrib.elasticagent.Constants.*;
 
 public class PluginRequest {
     private final GoApplicationAccessor accessor;

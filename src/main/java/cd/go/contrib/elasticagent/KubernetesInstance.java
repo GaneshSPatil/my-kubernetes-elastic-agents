@@ -23,8 +23,11 @@ import io.fabric8.kubernetes.client.KubernetesClient;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
+import static cd.go.contrib.elasticagent.Constants.KUBERNETES_POD_CREATION_TIME_FORMAT;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
 public class KubernetesInstance {
@@ -33,7 +36,7 @@ public class KubernetesInstance {
     private final Map<String, String> properties;
     private String name;
 
-    public KubernetesInstance(String name, Date createdAt, String environment, Map<String, String> properties) {
+    private KubernetesInstance(String name, Date createdAt, String environment, Map<String, String> properties) {
         this.name = name;
         this.createdAt = new DateTime(createdAt);
         this.environment = environment;
@@ -67,7 +70,7 @@ public class KubernetesInstance {
 
         ObjectMeta podMetadata = new ObjectMeta();
 
-        podMetadata.setLabels(labelsFrom(request, createdAt));
+        podMetadata.setLabels(labelsFrom(request));
         podMetadata.setAnnotations(request.properties());
         podMetadata.setName(containerName);
 
@@ -83,12 +86,20 @@ public class KubernetesInstance {
     }
 
     static KubernetesInstance fromInstanceInfo(Pod elasticAgentPod) {
-        ObjectMeta metadata = elasticAgentPod.getMetadata();
-        String containerName = metadata.getName();
-        Date createdAt = new Date();
-        createdAt.setTime(Long.valueOf(metadata.getLabels().get(Constants.POD_CREATED_AT_LABEL_KEY)));
-        String environment = metadata.getLabels().get(Constants.ENVIRONMENT_LABEL_KEY);
-        return new KubernetesInstance(containerName, createdAt, environment, elasticAgentPod.getMetadata().getAnnotations());
+        try {
+            ObjectMeta metadata = elasticAgentPod.getMetadata();
+            String containerName = metadata.getName();
+            String environment = metadata.getLabels().get(Constants.ENVIRONMENT_LABEL_KEY);
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat(KUBERNETES_POD_CREATION_TIME_FORMAT);
+            Date date = new Date();
+            if(StringUtils.isNotBlank(metadata.getCreationTimestamp())) {
+                date = simpleDateFormat.parse(metadata.getCreationTimestamp());
+
+            }
+            return new KubernetesInstance(containerName, date, environment, metadata.getAnnotations());
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private static List<EnvVar> environmentFrom(CreateAgentRequest request, PluginSettings settings, String containerName) {
@@ -113,7 +124,7 @@ public class KubernetesInstance {
         return envVars;
     }
 
-    private static HashMap<String, String> labelsFrom(CreateAgentRequest request, Date createdAt) {
+    private static HashMap<String, String> labelsFrom(CreateAgentRequest request) {
         HashMap<String, String> labels = new HashMap<>();
 
         labels.put(Constants.CREATED_BY_LABEL_KEY, Constants.PLUGIN_ID);
@@ -121,7 +132,6 @@ public class KubernetesInstance {
             labels.put(Constants.ENVIRONMENT_LABEL_KEY, request.environment());
         }
 
-        labels.put(Constants.POD_CREATED_AT_LABEL_KEY, String.valueOf(createdAt.getTime()));
         labels.put(Constants.KUBERNETES_POD_KIND_LABEL_KEY, Constants.KUBERNETES_POD_KIND_LABEL_VALUE);
 
         return labels;

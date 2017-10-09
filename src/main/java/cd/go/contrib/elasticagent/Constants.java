@@ -46,8 +46,8 @@ public interface Constants {
     String CREATED_BY_LABEL_KEY = "Elastic-Agent-Created-By";
     String ENVIRONMENT_LABEL_KEY = "Elastic-Agent-Environment-Name";
     String KUBERNETES_NAMESPACE_KEY = "default";
-    String POD_CREATED_AT_LABEL_KEY = "created_at";
     String KUBERNETES_POD_KIND_LABEL_KEY = "kind";
     String KUBERNETES_POD_KIND_LABEL_VALUE = "kubernetes-elastic-agent";
     String KUBERNETES_POD_NAME = "kubernetes-elastic-agent";
+    String KUBERNETES_POD_CREATION_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss'Z'";
 }

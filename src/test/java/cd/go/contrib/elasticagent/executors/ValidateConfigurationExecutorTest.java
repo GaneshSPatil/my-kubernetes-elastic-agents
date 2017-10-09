@@ -68,7 +68,7 @@ public class ValidateConfigurationExecutorTest {
     @Test
     public void shouldValidateAGoodConfiguration() throws Exception {
         ValidatePluginSettings settings = new ValidatePluginSettings();
-        settings.put("go_server_url", "https://ci.example.com");
+        settings.put("go_server_url", "https://ci.example.com/go");
         settings.put("kubernetes_cluster_url", "https://cluster.example.com");
         settings.put("auto_register_timeout", "10");
         GoPluginApiResponse response = new ValidateConfigurationExecutor(settings, null).execute();
@@ -97,7 +97,7 @@ public class ValidateConfigurationExecutorTest {
     @Test
     public void shouldValidateGoServerHTTPSUrlFormat() throws Exception {
         ValidatePluginSettings settings = new ValidatePluginSettings();
-        settings.put("go_server_url", "foo.com");
+        settings.put("go_server_url", "foo.com/go(");
         settings.put("kubernetes_cluster_url", "https://cluster.example.com");
         settings.put("auto_register_timeout", "10");
         GoPluginApiResponse response = new ValidateConfigurationExecutor(settings, pluginRequest).execute();

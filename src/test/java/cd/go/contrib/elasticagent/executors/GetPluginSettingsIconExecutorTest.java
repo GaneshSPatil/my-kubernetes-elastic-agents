@@ -17,7 +17,6 @@
 package cd.go.contrib.elasticagent.executors;
 
 import cd.go.contrib.elasticagent.utils.Util;
-import com.google.common.io.BaseEncoding;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;

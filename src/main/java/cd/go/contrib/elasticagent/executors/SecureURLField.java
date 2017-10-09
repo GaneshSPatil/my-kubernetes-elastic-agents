@@ -35,7 +35,7 @@ public class SecureURLField extends Field {
         try {
             URI uri = new URI(input);
             if (uri.getScheme() == null || !uri.getScheme().equalsIgnoreCase("https")) {
-                return this.displayName + " must be a valid HTTPs URL (https://example.com)";
+                return this.displayName + " must be a valid HTTPs URL (https://example.com).";
             }
         } catch (Exception e) {
             return this.displayName + " must be a valid URL (https://example.com)";

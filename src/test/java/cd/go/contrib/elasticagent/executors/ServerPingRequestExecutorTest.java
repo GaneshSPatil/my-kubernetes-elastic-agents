@@ -32,6 +32,7 @@ import org.junit.Test;
 import org.mockito.ArgumentMatcher;
 import org.mockito.Mock;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static org.junit.Assert.assertFalse;
@@ -65,7 +66,8 @@ public class ServerPingRequestExecutorTest extends BaseTest {
         when(podResource.get()).thenReturn(mockedPod);
 
         objectMetadata = new ObjectMeta();
-        objectMetadata.setLabels(Collections.singletonMap(Constants.POD_CREATED_AT_LABEL_KEY, String.valueOf(new Date().getTime())));
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(Constants.KUBERNETES_POD_CREATION_TIME_FORMAT);
+        objectMetadata.setCreationTimestamp(simpleDateFormat.format(new Date()));
         when(mockedPod.getMetadata()).thenReturn(objectMetadata);
     }
 
@@ -121,6 +123,7 @@ public class ServerPingRequestExecutorTest extends BaseTest {
         PluginRequest pluginRequest = mock(PluginRequest.class);
 
         objectMetadata.setName(container.name());
+        objectMetadata.setLabels(new HashMap<>());
         when(pluginRequest.getPluginSettings()).thenReturn(createSettings());
         when(pluginRequest.listAgents()).thenReturn(new Agents());
         verifyNoMoreInteractions(pluginRequest);
