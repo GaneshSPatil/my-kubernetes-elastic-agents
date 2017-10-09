@@ -31,9 +31,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ValidateConfigurationExecutor implements RequestExecutor {
-    private static final Gson GSON = new Gson();
+import static cd.go.contrib.elasticagent.KubernetesPlugin.LOG;
+import static cd.go.contrib.elasticagent.utils.Util.GSON;
 
+public class ValidateConfigurationExecutor implements RequestExecutor {
     private final ValidatePluginSettings settings;
     private PluginRequest pluginRequest;
 
@@ -43,6 +44,7 @@ public class ValidateConfigurationExecutor implements RequestExecutor {
     }
 
     public GoPluginApiResponse execute() throws ServerRequestFailedException {
+        LOG.debug("Validating plugin settings.");
         ArrayList<Map<String, String>> result = new ArrayList<>();
 
         for (Map.Entry<String, Field> entry : GetPluginConfigurationExecutor.FIELDS.entrySet()) {

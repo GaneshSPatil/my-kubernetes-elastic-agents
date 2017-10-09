@@ -21,21 +21,26 @@ import cd.go.contrib.elasticagent.Constants;
 import cd.go.contrib.elasticagent.PluginRequest;
 import cd.go.contrib.elasticagent.RequestExecutor;
 import cd.go.contrib.elasticagent.executors.CreateAgentRequestExecutor;
-import com.google.gson.FieldNamingPolicy;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
 import io.fabric8.kubernetes.api.model.EnvVar;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 
+import static cd.go.contrib.elasticagent.utils.Util.GSON;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 public class CreateAgentRequest {
-    private static final Gson GSON = new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).create();
+    @Expose
+    @SerializedName("auto_register_key")
     private String autoRegisterKey;
+    @Expose
+    @SerializedName("properties")
     private Map<String, String> properties;
+    @Expose
+    @SerializedName("environment")
     private String environment;
 
 

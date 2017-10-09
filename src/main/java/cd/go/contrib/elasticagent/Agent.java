@@ -17,7 +17,6 @@
 package cd.go.contrib.elasticagent;
 
 import com.google.gson.FieldNamingPolicy;
-import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
@@ -28,6 +27,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import static cd.go.contrib.elasticagent.utils.Util.GSON;
+
 /**
  * Represents an Agent.
  * See https://plugin-api.go.cd/current/elastic-agents/#the-elastic-agent-object for more details.
@@ -36,7 +37,6 @@ public class Agent {
 
     public static final Type AGENT_METADATA_LIST_TYPE = new TypeToken<ArrayList<Agent>>() {
     }.getType();
-    private static final Gson GSON = new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).create();
     @Expose
     @SerializedName("agent_id")
     private String agentId;
@@ -67,7 +67,7 @@ public class Agent {
     }
 
     public static String toJSONArray(Collection<Agent> metadata) {
-        return new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).create().toJson(metadata);
+        return GSON.toJson(metadata);
     }
 
     public String elasticAgentId() {

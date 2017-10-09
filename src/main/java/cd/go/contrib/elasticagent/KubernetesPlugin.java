@@ -35,7 +35,6 @@ import static cd.go.contrib.elasticagent.Constants.PLUGIN_IDENTIFIER;
 
 @Extension
 public class KubernetesPlugin implements GoPlugin {
-
     public static final Logger LOG = Logger.getLoggerFor(KubernetesPlugin.class);
 
     private PluginRequest pluginRequest;

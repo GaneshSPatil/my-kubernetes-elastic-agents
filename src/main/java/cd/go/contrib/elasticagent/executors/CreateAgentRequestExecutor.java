@@ -23,6 +23,8 @@ import cd.go.contrib.elasticagent.requests.CreateAgentRequest;
 import com.thoughtworks.go.plugin.api.response.DefaultGoPluginApiResponse;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
 
+import static cd.go.contrib.elasticagent.KubernetesPlugin.LOG;
+
 public class CreateAgentRequestExecutor implements RequestExecutor {
     private final AgentInstances agentInstances;
     private final PluginRequest pluginRequest;
@@ -36,6 +38,7 @@ public class CreateAgentRequestExecutor implements RequestExecutor {
 
     @Override
     public GoPluginApiResponse execute() throws Exception {
+        LOG.debug(String.format("[Create Agent] creating elastic agent for profile %s", request.properties()));
         agentInstances.create(request, pluginRequest.getPluginSettings());
         return new DefaultGoPluginApiResponse(200);
     }

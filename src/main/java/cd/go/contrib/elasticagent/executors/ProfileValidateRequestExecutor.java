@@ -25,8 +25,10 @@ import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
 
 import java.util.*;
 
+import static cd.go.contrib.elasticagent.KubernetesPlugin.LOG;
+import static cd.go.contrib.elasticagent.utils.Util.GSON;
+
 public class ProfileValidateRequestExecutor implements RequestExecutor {
-    private static final Gson GSON = new Gson();
     private final ProfileValidateRequest request;
 
     public ProfileValidateRequestExecutor(ProfileValidateRequest request) {
@@ -35,6 +37,7 @@ public class ProfileValidateRequestExecutor implements RequestExecutor {
 
     @Override
     public GoPluginApiResponse execute() throws Exception {
+        LOG.debug("Validating elastic profile.");
         ArrayList<Map<String, String>> result = new ArrayList<>();
 
         List<String> knownFields = new ArrayList<>();

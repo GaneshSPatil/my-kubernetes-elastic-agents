@@ -32,9 +32,9 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static cd.go.contrib.elasticagent.Constants.KUBERNETES_POD_CREATION_TIME_FORMAT;
+import static cd.go.contrib.elasticagent.KubernetesPlugin.LOG;
 
 public class KubernetesAgentInstances implements AgentInstances<KubernetesInstance> {
-    public static final Logger LOG = Logger.getLoggerFor(KubernetesAgentInstances.class);
     private final ConcurrentHashMap<String, KubernetesInstance> instances = new ConcurrentHashMap<>();
     public Clock clock = Clock.DEFAULT;
     private boolean refreshed;
@@ -100,10 +100,12 @@ public class KubernetesAgentInstances implements AgentInstances<KubernetesInstan
 
     @Override
     public void refreshAll(PluginRequest pluginRequest) throws Exception {
+        LOG.debug("Refreshing Elastic agents.");
         KubernetesClient client = factory.kubernetes(pluginRequest.getPluginSettings());
         PodList list = client.pods().inNamespace(Constants.KUBERNETES_NAMESPACE_KEY).list();
 
         if (!refreshed) {
+            LOG.debug("Syncing k8s elastic agent pod information");
             for (Pod pod : list.getItems()) {
                 Map<String, String> podLabels = pod.getMetadata().getLabels();
                 if (podLabels != null) {

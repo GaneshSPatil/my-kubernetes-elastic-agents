@@ -18,16 +18,15 @@ package cd.go.contrib.elasticagent.executors;
 
 import cd.go.contrib.elasticagent.RequestExecutor;
 import cd.go.contrib.elasticagent.utils.Util;
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.thoughtworks.go.plugin.api.response.DefaultGoPluginApiResponse;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
 
 import java.util.Base64;
 
-public class GetPluginSettingsIconExecutor implements RequestExecutor {
-    private static final Gson GSON = new Gson();
+import static cd.go.contrib.elasticagent.utils.Util.GSON;
 
+public class GetPluginSettingsIconExecutor implements RequestExecutor {
     @Override
     public GoPluginApiResponse execute() throws Exception {
         JsonObject jsonObject = new JsonObject();

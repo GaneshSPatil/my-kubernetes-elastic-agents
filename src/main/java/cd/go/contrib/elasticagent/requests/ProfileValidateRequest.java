@@ -22,9 +22,9 @@ import com.google.gson.Gson;
 
 import java.util.Map;
 
-public class ProfileValidateRequest {
+import static cd.go.contrib.elasticagent.utils.Util.GSON;
 
-    private static final Gson GSON = new Gson();
+public class ProfileValidateRequest {
     private Map<String, String> properties;
 
     public ProfileValidateRequest(Map<String, String> properties) {

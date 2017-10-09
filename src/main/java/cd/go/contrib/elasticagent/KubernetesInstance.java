@@ -28,6 +28,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static cd.go.contrib.elasticagent.Constants.KUBERNETES_POD_CREATION_TIME_FORMAT;
+import static cd.go.contrib.elasticagent.KubernetesPlugin.LOG;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
 public class KubernetesInstance {
@@ -45,7 +46,6 @@ public class KubernetesInstance {
 
     public static KubernetesInstance create(CreateAgentRequest request, PluginSettings settings, KubernetesClient client) {
         String containerName = Constants.KUBERNETES_POD_NAME + UUID.randomUUID().toString();
-        Date createdAt = new Date();
 
         Container container = new Container();
         container.setName(containerName);
@@ -57,12 +57,14 @@ public class KubernetesInstance {
         resources.setLimits(new HashMap<String, Quantity>() {{
             String maxMemory = request.properties().get("MaxMemory");
             if (StringUtils.isNotBlank(maxMemory)) {
+                LOG.debug(String.format("[Create Agent] Setting memory resource limit on k8s pod:%s", maxMemory));
                 Size mem = Size.parse(maxMemory);
                 put("memory", new Quantity(String.valueOf(mem.toMegabytes()), "Mi"));
             }
 
             String maxCPU = request.properties().get("MaxCPU");
             if (StringUtils.isNotBlank(maxCPU)) {
+                LOG.debug(String.format("[Create Agent] Setting cpu resource limit on k8s pod:%s", maxCPU));
                 put("cpu", new Quantity(maxCPU));
             }
         }});
@@ -81,6 +83,7 @@ public class KubernetesInstance {
         PodStatus podStatus = new PodStatus();
         Pod elasticAgentPod = new Pod("v1", "Pod", podMetadata, podSpec, podStatus);
 
+        LOG.info(String.format("[Create Agent] Creating K8s pod with spec:%s", elasticAgentPod.toString()));
         client.pods().inNamespace(Constants.KUBERNETES_NAMESPACE_KEY).create(elasticAgentPod);
         return fromInstanceInfo(elasticAgentPod);
     }

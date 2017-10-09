@@ -19,18 +19,20 @@ package cd.go.contrib.elasticagent.requests;
 import cd.go.contrib.elasticagent.PluginRequest;
 import cd.go.contrib.elasticagent.RequestExecutor;
 import cd.go.contrib.elasticagent.executors.ValidateConfigurationExecutor;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.HashMap;
 
+import static cd.go.contrib.elasticagent.utils.Util.GSON;
+
 public class ValidatePluginSettings {
-    private static final Gson GSON = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
     @Expose
     @SerializedName("plugin-settings")
     private PluginSettings pluginSettings = new PluginSettings();
+
+    public ValidatePluginSettings() {
+    }
 
     public static ValidatePluginSettings fromJSON(String json) {
         return GSON.fromJson(json, ValidatePluginSettings.class);

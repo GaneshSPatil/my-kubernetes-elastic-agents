@@ -16,14 +16,18 @@
 
 package cd.go.contrib.elasticagent.executors;
 
+import cd.go.contrib.elasticagent.RequestExecutor;
 import cd.go.contrib.elasticagent.model.Capabilities;
 import com.thoughtworks.go.plugin.api.response.DefaultGoPluginApiResponse;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
 
+import static cd.go.contrib.elasticagent.KubernetesPlugin.LOG;
 import static com.thoughtworks.go.plugin.api.response.DefaultGoApiResponse.SUCCESS_RESPONSE_CODE;
 
-public class GetCapabilitiesExecutor {
+public class GetCapabilitiesExecutor implements RequestExecutor {
     public GoPluginApiResponse execute() {
-        return new DefaultGoPluginApiResponse(SUCCESS_RESPONSE_CODE, new Capabilities(false).toJSON());
+        String capabilities = new Capabilities(false).toJSON();
+        LOG.debug("Plugin capabilities:" + capabilities);
+        return new DefaultGoPluginApiResponse(SUCCESS_RESPONSE_CODE, capabilities);
     }
 }

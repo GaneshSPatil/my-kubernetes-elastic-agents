@@ -21,13 +21,13 @@ import cd.go.contrib.elasticagent.model.Field;
 import cd.go.contrib.elasticagent.model.GoServerUrlField;
 import cd.go.contrib.elasticagent.model.PositiveNumberField;
 import cd.go.contrib.elasticagent.model.SecureURLField;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.thoughtworks.go.plugin.api.response.DefaultGoPluginApiResponse;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+
+import static cd.go.contrib.elasticagent.utils.Util.GSON;
 
 public class GetPluginConfigurationExecutor implements RequestExecutor {
     public static final Field GO_SERVER_URL = new GoServerUrlField("go_server_url", "Go Server URL", false, "0");
@@ -37,7 +37,6 @@ public class GetPluginConfigurationExecutor implements RequestExecutor {
     public static final Field KUBERNETES_CLUSTER_PASSWORD = new Field("kubernetes_cluster_password", "Kubernetes Cluster Password", null, false, true, "4");
     public static final Field KUBERNETES_CLUSTER_CA_CERT = new Field("kubernetes_cluster_ca_cert", "Kubernetes Cluster CA Certificate", null, false, true, "5");
     public static final Map<String, Field> FIELDS = new LinkedHashMap<>();
-    private static final Gson GSON = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
 
     static {
         FIELDS.put(GO_SERVER_URL.key(), GO_SERVER_URL);

@@ -26,6 +26,7 @@ import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
 import java.util.HashMap;
 import java.util.Map;
 
+import static cd.go.contrib.elasticagent.KubernetesPlugin.LOG;
 import static org.apache.commons.lang3.StringUtils.stripToEmpty;
 
 public class ShouldAssignWorkRequestExecutor implements RequestExecutor {
@@ -54,6 +55,7 @@ public class ShouldAssignWorkRequestExecutor implements RequestExecutor {
         boolean propertiesMatch = requestProperties.equals(containerProperties);
 
         if (environmentMatches && propertiesMatch) {
+            LOG.debug(String.format("[Should Assign Work] Assigning job[%s] to agent[%s]", request.properties(), request.agent().elasticAgentId()));
             return DefaultGoPluginApiResponse.success("true");
         }
 

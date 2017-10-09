@@ -16,19 +16,13 @@
 
 package cd.go.contrib.elasticagent;
 
-import com.google.gson.FieldNamingPolicy;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import org.joda.time.Period;
 
-public class PluginSettings {
-    public static final Gson GSON = new GsonBuilder()
-            .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
-            .excludeFieldsWithoutExposeAnnotation()
-            .create();
+import static cd.go.contrib.elasticagent.utils.Util.GSON;
 
+public class PluginSettings {
     @Expose
     @SerializedName("go_server_url")
     private String goServerUrl;

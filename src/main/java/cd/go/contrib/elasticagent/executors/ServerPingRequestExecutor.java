@@ -22,6 +22,8 @@ import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
 
 import java.util.Collection;
 
+import static cd.go.contrib.elasticagent.KubernetesPlugin.LOG;
+
 public class ServerPingRequestExecutor implements RequestExecutor {
 
     private final AgentInstances agentInstances;
@@ -41,12 +43,14 @@ public class ServerPingRequestExecutor implements RequestExecutor {
 
         for (Agent agent : allAgents.agents()) {
             if (agentInstances.find(agent.elasticAgentId()) == null) {
-                KubernetesPlugin.LOG.warn("Was expecting a container with name " + agent.elasticAgentId() + ", but it was missing!");
+                LOG.warn(String.format("Was expecting a container with name %s, but it was missing!", agent.elasticAgentId()));
                 missingAgents.add(agent);
             }
         }
 
+        LOG.debug(String.format("[Server Ping] Missing Agents:%s", missingAgents.agentIds()));
         Agents agentsToDisable = agentInstances.instancesCreatedAfterTimeout(pluginSettings, allAgents);
+        LOG.debug(String.format("[Server Ping] Agent Created After Timeout:%s", agentsToDisable.agentIds()));
         agentsToDisable.addAll(missingAgents);
 
         disableIdleAgents(agentsToDisable);

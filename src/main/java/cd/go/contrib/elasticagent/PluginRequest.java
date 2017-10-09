@@ -24,6 +24,7 @@ import com.thoughtworks.go.plugin.api.response.GoApiResponse;
 import java.util.Collection;
 
 import static cd.go.contrib.elasticagent.Constants.*;
+import static cd.go.contrib.elasticagent.KubernetesPlugin.LOG;
 
 public class PluginRequest {
     private final GoApplicationAccessor accessor;
@@ -70,6 +71,7 @@ public class PluginRequest {
     }
 
     public void disableAgents(Collection<Agent> toBeDisabled) throws ServerRequestFailedException {
+        LOG.debug("[Server Ping] Disabling Agents:"+toBeDisabled.toString());
         if (toBeDisabled.isEmpty()) {
             return;
         }
@@ -85,6 +87,7 @@ public class PluginRequest {
     }
 
     public void deleteAgents(Collection<Agent> toBeDeleted) throws ServerRequestFailedException {
+        LOG.debug("[Server Ping] Deleting Agents:"+toBeDeleted.toString());
         if (toBeDeleted.isEmpty()) {
             return;
         }

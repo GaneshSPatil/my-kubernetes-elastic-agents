@@ -21,19 +21,25 @@ import cd.go.contrib.elasticagent.AgentInstances;
 import cd.go.contrib.elasticagent.Request;
 import cd.go.contrib.elasticagent.RequestExecutor;
 import cd.go.contrib.elasticagent.executors.ShouldAssignWorkRequestExecutor;
-import com.google.gson.FieldNamingPolicy;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
 
 import java.util.Map;
+
+import static cd.go.contrib.elasticagent.utils.Util.GSON;
 
 /**
  * Represents the {@link Request#REQUEST_SHOULD_ASSIGN_WORK} message.
  */
 public class ShouldAssignWorkRequest {
-    public static final Gson GSON = new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).create();
+    @Expose
+    @SerializedName("agent")
     private Agent agent;
+    @Expose
+    @SerializedName("environment")
     private String environment;
+    @Expose
+    @SerializedName("properties")
     private Map<String, String> properties;
 
     public ShouldAssignWorkRequest(Agent agent, String environment, Map<String, String> properties) {
