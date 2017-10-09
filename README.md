@@ -1,30 +1,14 @@
 # Kubernetes Elastic agent plugin for GoCD
 
-# Kubernetes Elastic Agent
-Kubernetes Elastic Agent Plugin provides production grade support to run GoCD agents on kubernetes cluster.
+Kubernetes Elastic Agent Plugin provides production grade support to run GoCD Elastic Agents on Kubernetes Cluster.
 
-> **Note:** Kubernetes Elastic Agent Plugin can work with GoCD server running on any environment. 
-__(GoCD server on k8s, on bare-metal, on a VM, or on a container)__
+# Installation
 
-## How to get started:
-* Start Kubernetes cluster.
-```
-minikube start
-```
-* Install Plugin on GoCD Server.
-  * Drop plugin under `server/plugins/external` directory.
+Documentation for installation is available [here](INSTALL.md)
 
-* Configure plugin settings
-  * Specify `Go Server Url` 
-  * Specify `Agent auto-register Timeout (in minutes)`
-  * Specify `Kubernetes Cluster URL`
-  > Find kubernetes cluster url using `kubectl cluster-info`
+## Building the code base
 
-* Create Elastic Agent Profile using `kubernetes-elastic-agent` plugin
-
-* Create a job with created `elastic-agent-profile`.
-* Trigger builds.
-
+To build the jar, run `./gradlew clean prepare build`
 
 ## License
 
