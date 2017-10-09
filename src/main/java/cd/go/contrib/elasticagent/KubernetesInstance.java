@@ -44,12 +44,12 @@ public class KubernetesInstance {
         this.properties = properties;
     }
 
-    public static KubernetesInstance create(CreateAgentRequest request, PluginSettings settings, KubernetesClient client) {
+    public static KubernetesInstance create(CreateAgentRequest request, PluginSettings settings, KubernetesClient client, PluginRequest pluginRequest) {
         String containerName = Constants.KUBERNETES_POD_NAME + UUID.randomUUID().toString();
 
         Container container = new Container();
         container.setName(containerName);
-        container.setEnv(environmentFrom(request, settings, containerName));
+        container.setEnv(environmentFrom(request, settings, containerName, pluginRequest));
         container.setImage(image(request.properties()));
         container.setImagePullPolicy("IfNotPresent");
 
@@ -105,9 +105,10 @@ public class KubernetesInstance {
         }
     }
 
-    private static List<EnvVar> environmentFrom(CreateAgentRequest request, PluginSettings settings, String containerName) {
+    private static List<EnvVar> environmentFrom(CreateAgentRequest request, PluginSettings settings, String containerName, PluginRequest pluginRequest) {
         ArrayList<EnvVar> env = new ArrayList<>();
-        env.add(new EnvVar("GO_EA_SERVER_URL", settings.getGoServerUrl(), null));
+        String goServerUrl = StringUtils.isBlank(settings.getGoServerUrl()) ? pluginRequest.getSeverInfo().getSecureSiteUrl() : settings.getGoServerUrl();
+        env.add(new EnvVar("GO_EA_SERVER_URL", goServerUrl, null));
         String environment = request.properties().get("Environment");
         if (StringUtils.isNotBlank(environment)) {
             env.addAll(parseEnvironments(environment));

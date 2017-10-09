@@ -24,15 +24,15 @@ import static cd.go.contrib.elasticagent.utils.Util.GSON;
 public class ServerInfo {
     @Expose
     @SerializedName("server_id")
-    public String serverId;
+    private String serverId;
 
     @Expose
     @SerializedName("site_url")
-    public String siteUrl;
+    private String siteUrl;
 
     @Expose
     @SerializedName("secure_site_url")
-    public String secureSiteUrl;
+    private String secureSiteUrl;
 
     public String getServerId() {
         return serverId;

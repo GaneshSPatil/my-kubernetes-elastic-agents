@@ -117,7 +117,7 @@ public class ServerPingRequestExecutorTest extends BaseTest {
         KubernetesAgentInstances agentInstances = new KubernetesAgentInstances(factory);
         HashMap<String, String> properties = new HashMap<>();
         properties.put("Image", "foo");
-        KubernetesInstance container = agentInstances.create(new CreateAgentRequest(null, properties, null), createSettings());
+        KubernetesInstance container = agentInstances.create(new CreateAgentRequest(null, properties, null), createSettings(), null);
 
         agentInstances.clock = new Clock.TestClock().forward(Period.minutes(11));
         PluginRequest pluginRequest = mock(PluginRequest.class);

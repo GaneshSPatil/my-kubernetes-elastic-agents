@@ -111,4 +111,8 @@ public class PluginSettings {
     public String getKubernetesClusterCACert() {
         return kubernetesClusterCACert;
     }
+
+    public void setGoServerUrl(String goServerUrl) {
+        this.goServerUrl = goServerUrl;
+    }
 }

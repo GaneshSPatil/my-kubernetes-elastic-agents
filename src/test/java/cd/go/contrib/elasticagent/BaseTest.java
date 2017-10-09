@@ -21,6 +21,7 @@ import java.io.IOException;
 public abstract class BaseTest {
     protected PluginSettings createSettings() throws IOException {
         PluginSettings pluginSettings = new PluginSettings();
+        pluginSettings.setGoServerUrl("https://localhost:8154/go");
         return pluginSettings;
     }
 }

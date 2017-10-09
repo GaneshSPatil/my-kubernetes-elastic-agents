@@ -68,7 +68,7 @@ public class ShouldAssignWorkRequestExecutorTest extends BaseTest {
         agentInstances = new KubernetesAgentInstances(factory);
         properties.put("foo", "bar");
         properties.put("Image", "gocdcontrib/ubuntu-docker-elastic-agent");
-        instance = agentInstances.create(new CreateAgentRequest(UUID.randomUUID().toString(), properties, environment), createSettings());
+        instance = agentInstances.create(new CreateAgentRequest(UUID.randomUUID().toString(), properties, environment), createSettings(), null);
     }
 
     @Test

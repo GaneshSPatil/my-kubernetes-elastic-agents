@@ -20,7 +20,7 @@ import com.thoughtworks.go.plugin.api.response.GoApiResponse;
 
 import static java.lang.String.format;
 
-public class ServerRequestFailedException extends Exception {
+public class ServerRequestFailedException extends RuntimeException {
 
     private ServerRequestFailedException(GoApiResponse response, String request) {
         super(format(

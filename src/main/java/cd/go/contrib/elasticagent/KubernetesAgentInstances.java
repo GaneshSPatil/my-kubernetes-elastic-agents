@@ -17,7 +17,6 @@
 package cd.go.contrib.elasticagent;
 
 import cd.go.contrib.elasticagent.requests.CreateAgentRequest;
-import com.thoughtworks.go.plugin.api.logging.Logger;
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.api.model.PodList;
 import io.fabric8.kubernetes.client.KubernetesClient;
@@ -49,9 +48,9 @@ public class KubernetesAgentInstances implements AgentInstances<KubernetesInstan
     }
 
     @Override
-    public KubernetesInstance create(CreateAgentRequest request, PluginSettings settings) throws Exception {
+    public KubernetesInstance create(CreateAgentRequest request, PluginSettings settings, PluginRequest pluginRequest) throws Exception {
         KubernetesClient client = factory.kubernetes(settings);
-        KubernetesInstance instance = KubernetesInstance.create(request, settings, client);
+        KubernetesInstance instance = KubernetesInstance.create(request, settings, client, pluginRequest);
         register(instance);
 
         return instance;

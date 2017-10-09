@@ -39,7 +39,7 @@ public class CreateAgentRequestExecutor implements RequestExecutor {
     @Override
     public GoPluginApiResponse execute() throws Exception {
         LOG.debug(String.format("[Create Agent] creating elastic agent for profile %s", request.properties()));
-        agentInstances.create(request, pluginRequest.getPluginSettings());
+        agentInstances.create(request, pluginRequest.getPluginSettings(), pluginRequest);
         return new DefaultGoPluginApiResponse(200);
     }
 
