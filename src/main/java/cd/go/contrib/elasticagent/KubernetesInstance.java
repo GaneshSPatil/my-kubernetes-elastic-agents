@@ -114,7 +114,7 @@ public class KubernetesInstance {
     static KubernetesInstance fromInstanceInfo(Pod elasticAgentPod) {
         try {
             ObjectMeta metadata = elasticAgentPod.getMetadata();
-            String containerName = elasticAgentPod.getSpec().getContainers().get(0).getName();
+            String containerName = metadata.getName();
             String environment = metadata.getLabels().get(Constants.ENVIRONMENT_LABEL_KEY);
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat(KUBERNETES_POD_CREATION_TIME_FORMAT);
             Date date = new Date();
@@ -128,7 +128,7 @@ public class KubernetesInstance {
         }
     }
 
-    private static List<EnvVar> environmentFrom(CreateAgentRequest request, PluginSettings settings, String containerName, PluginRequest pluginRequest) {
+    private static List<EnvVar> environmentFrom(CreateAgentRequest request, PluginSettings settings, String podName, PluginRequest pluginRequest) {
         ArrayList<EnvVar> env = new ArrayList<>();
         String goServerUrl = StringUtils.isBlank(settings.getGoServerUrl()) ? pluginRequest.getSeverInfo().getSecureSiteUrl() : settings.getGoServerUrl();
         env.add(new EnvVar("GO_EA_SERVER_URL", goServerUrl, null));
@@ -136,7 +136,7 @@ public class KubernetesInstance {
         if (StringUtils.isNotBlank(environment)) {
             env.addAll(parseEnvironments(environment));
         }
-        env.addAll(request.autoregisterPropertiesAsEnvironmentVars(containerName));
+        env.addAll(request.autoregisterPropertiesAsEnvironmentVars(podName));
 
         return new ArrayList<>(env);
     }
@@ -144,7 +144,7 @@ public class KubernetesInstance {
     private static void setContainerEnvVariables(Pod pod, CreateAgentRequest request, PluginSettings settings, PluginRequest pluginRequest) {
         for (Container container : pod.getSpec().getContainers()) {
             List<EnvVar> existingEnv = (container.getEnv() != null) ? container.getEnv() : new ArrayList<>();
-            existingEnv.addAll(environmentFrom(request, settings, container.getName(), pluginRequest));
+            existingEnv.addAll(environmentFrom(request, settings, pod.getMetadata().getName(), pluginRequest));
             container.setEnv(existingEnv);
         }
     }
