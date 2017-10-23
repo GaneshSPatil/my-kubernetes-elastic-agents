@@ -32,6 +32,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static cd.go.contrib.elasticagent.Constants.KUBERNETES_POD_CREATION_TIME_FORMAT;
 import static cd.go.contrib.elasticagent.KubernetesPlugin.LOG;
+import static cd.go.contrib.elasticagent.executors.GetProfileMetadataExecutor.POD_CONFIGURATION;
 
 public class KubernetesAgentInstances implements AgentInstances<KubernetesInstance> {
     private final ConcurrentHashMap<String, KubernetesInstance> instances = new ConcurrentHashMap<>();
@@ -50,10 +51,20 @@ public class KubernetesAgentInstances implements AgentInstances<KubernetesInstan
     @Override
     public KubernetesInstance create(CreateAgentRequest request, PluginSettings settings, PluginRequest pluginRequest) throws Exception {
         KubernetesClient client = factory.kubernetes(settings);
-        KubernetesInstance instance = KubernetesInstance.create(request, settings, client, pluginRequest);
+        KubernetesInstance instance;
+        if(isUsingPodYaml(request)) {
+            instance = KubernetesInstance.createUsingPodYaml(request, settings, client, pluginRequest);
+        } else {
+            instance = KubernetesInstance.create(request, settings, client, pluginRequest);
+        }
+
         register(instance);
 
         return instance;
+    }
+
+    private boolean isUsingPodYaml(CreateAgentRequest request) {
+        return StringUtils.isNotBlank(request.properties().get(POD_CONFIGURATION.getKey()));
     }
 
     @Override

@@ -18,17 +18,21 @@ package cd.go.contrib.elasticagent;
 
 import cd.go.contrib.elasticagent.requests.CreateAgentRequest;
 import cd.go.contrib.elasticagent.utils.Size;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import io.fabric8.kubernetes.api.model.*;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 
+import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static cd.go.contrib.elasticagent.Constants.KUBERNETES_POD_CREATION_TIME_FORMAT;
 import static cd.go.contrib.elasticagent.KubernetesPlugin.LOG;
+import static cd.go.contrib.elasticagent.executors.GetProfileMetadataExecutor.POD_CONFIGURATION;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
 public class KubernetesInstance {
@@ -49,7 +53,6 @@ public class KubernetesInstance {
 
         Container container = new Container();
         container.setName(containerName);
-        container.setEnv(environmentFrom(request, settings, containerName, pluginRequest));
         container.setImage(image(request.properties()));
         container.setImagePullPolicy("IfNotPresent");
 
@@ -71,18 +74,33 @@ public class KubernetesInstance {
         container.setResources(resources);
 
         ObjectMeta podMetadata = new ObjectMeta();
-
-        podMetadata.setLabels(labelsFrom(request));
-        podMetadata.setAnnotations(request.properties());
         podMetadata.setName(containerName);
 
         PodSpec podSpec = new PodSpec();
-        podSpec.setContainers(new ArrayList<Container>() {{
-            add(container);
-        }});
-        PodStatus podStatus = new PodStatus();
-        Pod elasticAgentPod = new Pod("v1", "Pod", podMetadata, podSpec, podStatus);
+        podSpec.setContainers(Arrays.asList(container));
 
+        Pod elasticAgentPod = new Pod("v1", "Pod", podMetadata, podSpec, new PodStatus());
+
+        setContainerEnvVariables(elasticAgentPod, request, settings, pluginRequest);
+        setAnnotations(elasticAgentPod, request);
+        setLabels(elasticAgentPod, request);
+
+        return createKubernetesPod(client, elasticAgentPod);
+    }
+
+    private static void setLabels(Pod pod, CreateAgentRequest request) {
+        Map<String, String> existingLabels = (pod.getMetadata().getLabels() != null) ? pod.getMetadata().getLabels() : new HashMap<>();
+        existingLabels.putAll(labelsFrom(request));
+        pod.getMetadata().setLabels(existingLabels);
+    }
+
+    private static void setAnnotations(Pod pod, CreateAgentRequest request) {
+        Map<String, String> existingAnnotations = (pod.getMetadata().getAnnotations() != null) ? pod.getMetadata().getAnnotations() : new HashMap<>();
+        existingAnnotations.putAll(request.properties());
+        pod.getMetadata().setAnnotations(existingAnnotations);
+    }
+
+    private static KubernetesInstance createKubernetesPod(KubernetesClient client, Pod elasticAgentPod) {
         LOG.info(String.format("[Create Agent] Creating K8s pod with spec:%s", elasticAgentPod.toString()));
         client.pods().inNamespace(Constants.KUBERNETES_NAMESPACE_KEY).create(elasticAgentPod);
         return fromInstanceInfo(elasticAgentPod);
@@ -91,7 +109,7 @@ public class KubernetesInstance {
     static KubernetesInstance fromInstanceInfo(Pod elasticAgentPod) {
         try {
             ObjectMeta metadata = elasticAgentPod.getMetadata();
-            String containerName = metadata.getName();
+            String containerName = elasticAgentPod.getSpec().getContainers().get(0).getName();
             String environment = metadata.getLabels().get(Constants.ENVIRONMENT_LABEL_KEY);
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat(KUBERNETES_POD_CREATION_TIME_FORMAT);
             Date date = new Date();
@@ -116,6 +134,14 @@ public class KubernetesInstance {
         env.addAll(request.autoregisterPropertiesAsEnvironmentVars(containerName));
 
         return new ArrayList<>(env);
+    }
+
+    private static void setContainerEnvVariables(Pod pod, CreateAgentRequest request, PluginSettings settings, PluginRequest pluginRequest) {
+        for (Container container : pod.getSpec().getContainers()) {
+            List<EnvVar> existingEnv = (container.getEnv() != null) ? container.getEnv() : new ArrayList<>();
+            existingEnv.addAll(environmentFrom(request, settings, container.getName(), pluginRequest));
+            container.setEnv(existingEnv);
+        }
     }
 
     private static Collection<? extends EnvVar> parseEnvironments(String environment) {
@@ -187,5 +213,26 @@ public class KubernetesInstance {
 
     public Map<String, String> getInstanceProperties() {
         return properties;
+    }
+
+    public static KubernetesInstance createUsingPodYaml(CreateAgentRequest request, PluginSettings settings, KubernetesClient client, PluginRequest pluginRequest) {
+        ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+        String podYaml = request.properties().get(POD_CONFIGURATION.getKey());
+        Pod elasticAgentPod = new Pod();
+        try {
+            elasticAgentPod = mapper.readValue(podYaml, Pod.class);
+        } catch (IOException e) {
+            //ignore error here, handle this inside validate!
+            e.printStackTrace();
+        }
+
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(KUBERNETES_POD_CREATION_TIME_FORMAT);
+        elasticAgentPod.getMetadata().setCreationTimestamp(simpleDateFormat.format(new Date()));
+
+        setContainerEnvVariables(elasticAgentPod, request, settings, pluginRequest);
+        setAnnotations(elasticAgentPod, request);
+        setLabels(elasticAgentPod, request);
+
+        return createKubernetesPod(client, elasticAgentPod);
     }
 }

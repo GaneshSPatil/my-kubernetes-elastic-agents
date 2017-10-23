@@ -28,7 +28,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
 public class GetProfileMetadataExecutorTest {
-
     @Test
     public void shouldSerializeAllFields() throws Exception {
         GoPluginApiResponse response = new GetProfileMetadataExecutor().execute();
@@ -45,7 +44,7 @@ public class GetProfileMetadataExecutorTest {
                 "  {\n" +
                 "    \"key\": \"Image\",\n" +
                 "    \"metadata\": {\n" +
-                "      \"required\": true,\n" +
+                "      \"required\": false,\n" +
                 "      \"secure\": false\n" +
                 "    }\n" +
                 "  },\n" +
@@ -65,6 +64,13 @@ public class GetProfileMetadataExecutorTest {
                 "  },\n" +
                 "  {\n" +
                 "    \"key\": \"Environment\",\n" +
+                "    \"metadata\": {\n" +
+                "      \"required\": false,\n" +
+                "      \"secure\": false\n" +
+                "    }\n" +
+                "  },\n" +
+                "  {\n" +
+                "    \"key\": \"PodConfiguration\",\n" +
                 "    \"metadata\": {\n" +
                 "      \"required\": false,\n" +
                 "      \"secure\": false\n" +

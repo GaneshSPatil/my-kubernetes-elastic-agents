@@ -55,7 +55,7 @@ public class GetProfileViewExecutorTest {
             assertThat(spanToShowError.text(), is("{{GOINPUTNAME[" + field.getKey() + "].$error.server}}"));
         }
 
-        final Elements inputs = document.select("textarea,input,select");
+        final Elements inputs = document.select("textarea,input[type=text],select");
         assertThat(inputs, hasSize(GetProfileMetadataExecutor.FIELDS.size()));
     }
 
