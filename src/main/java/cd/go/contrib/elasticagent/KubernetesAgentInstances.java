@@ -24,17 +24,14 @@ import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.Period;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static cd.go.contrib.elasticagent.Constants.KUBERNETES_POD_CREATION_TIME_FORMAT;
 import static cd.go.contrib.elasticagent.KubernetesPlugin.LOG;
-import static cd.go.contrib.elasticagent.executors.GetProfileMetadataExecutor.POD_CONFIGURATION;
 import static cd.go.contrib.elasticagent.executors.GetProfileMetadataExecutor.SPECIFIED_USING_POD_CONFIGURATION;
+import static cd.go.contrib.elasticagent.utils.Util.getSimpleDateFormat;
 
 public class KubernetesAgentInstances implements AgentInstances<KubernetesInstance> {
     private final ConcurrentHashMap<String, KubernetesInstance> instances = new ConcurrentHashMap<>();
@@ -146,7 +143,7 @@ public class KubernetesAgentInstances implements AgentInstances<KubernetesInstan
 
     private KubernetesAgentInstances unregisteredAfterTimeout(PluginSettings settings, Agents knownAgents) throws Exception {
         Period period = settings.getAutoRegisterPeriod();
-        KubernetesAgentInstances unregisteredContainers = new KubernetesAgentInstances();
+        KubernetesAgentInstances unregisteredInstances = new KubernetesAgentInstances();
         KubernetesClient client = factory.kubernetes(settings);
 
         for (String instanceName : instances.keySet()) {
@@ -154,15 +151,13 @@ public class KubernetesAgentInstances implements AgentInstances<KubernetesInstan
                 continue;
             }
             Pod pod = client.pods().inNamespace(Constants.KUBERNETES_NAMESPACE_KEY).withName(instanceName).get();
-
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat(KUBERNETES_POD_CREATION_TIME_FORMAT);
-            Date createdAt = simpleDateFormat.parse(pod.getMetadata().getCreationTimestamp());
+            Date createdAt = getSimpleDateFormat().parse(pod.getMetadata().getCreationTimestamp());
             DateTime dateTimeCreated = new DateTime(createdAt);
 
             if (clock.now().isAfter(dateTimeCreated.plus(period))) {
-                unregisteredContainers.register(KubernetesInstance.fromInstanceInfo(pod));
+                unregisteredInstances.register(KubernetesInstance.fromInstanceInfo(pod));
             }
         }
-        return unregisteredContainers;
+        return unregisteredInstances;
     }
 }

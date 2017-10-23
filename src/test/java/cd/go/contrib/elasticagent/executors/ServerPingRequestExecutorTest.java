@@ -35,6 +35,7 @@ import org.mockito.Mock;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import static cd.go.contrib.elasticagent.utils.Util.getSimpleDateFormat;
 import static org.junit.Assert.assertFalse;
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
@@ -66,8 +67,7 @@ public class ServerPingRequestExecutorTest extends BaseTest {
         when(podResource.get()).thenReturn(mockedPod);
 
         objectMetadata = new ObjectMeta();
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(Constants.KUBERNETES_POD_CREATION_TIME_FORMAT);
-        objectMetadata.setCreationTimestamp(simpleDateFormat.format(new Date()));
+        objectMetadata.setCreationTimestamp(getSimpleDateFormat().format(new Date()));
         when(mockedPod.getMetadata()).thenReturn(objectMetadata);
     }
 

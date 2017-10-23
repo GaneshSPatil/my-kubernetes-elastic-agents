@@ -18,6 +18,7 @@ package cd.go.contrib.elasticagent;
 
 import cd.go.contrib.elasticagent.requests.CreateAgentRequest;
 import cd.go.contrib.elasticagent.utils.Size;
+import cd.go.contrib.elasticagent.utils.Util;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.github.mustachejava.DefaultMustacheFactory;
@@ -27,6 +28,7 @@ import io.fabric8.kubernetes.api.model.*;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -38,6 +40,7 @@ import java.util.*;
 import static cd.go.contrib.elasticagent.Constants.KUBERNETES_POD_CREATION_TIME_FORMAT;
 import static cd.go.contrib.elasticagent.KubernetesPlugin.LOG;
 import static cd.go.contrib.elasticagent.executors.GetProfileMetadataExecutor.POD_CONFIGURATION;
+import static cd.go.contrib.elasticagent.utils.Util.getSimpleDateFormat;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
 public class KubernetesInstance {
@@ -48,7 +51,7 @@ public class KubernetesInstance {
 
     private KubernetesInstance(String name, Date createdAt, String environment, Map<String, String> properties) {
         this.name = name;
-        this.createdAt = new DateTime(createdAt);
+        this.createdAt = new DateTime(createdAt).withZone(DateTimeZone.UTC);
         this.environment = environment;
         this.properties = properties;
     }
@@ -116,11 +119,10 @@ public class KubernetesInstance {
             ObjectMeta metadata = elasticAgentPod.getMetadata();
             String containerName = metadata.getName();
             String environment = metadata.getLabels().get(Constants.ENVIRONMENT_LABEL_KEY);
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat(KUBERNETES_POD_CREATION_TIME_FORMAT);
+
             Date date = new Date();
             if(StringUtils.isNotBlank(metadata.getCreationTimestamp())) {
-                date = simpleDateFormat.parse(metadata.getCreationTimestamp());
-
+                date = getSimpleDateFormat().parse(metadata.getCreationTimestamp());
             }
             return new KubernetesInstance(containerName, date, environment, metadata.getAnnotations());
         } catch (ParseException e) {
@@ -228,7 +230,7 @@ public class KubernetesInstance {
         MustacheFactory mf = new DefaultMustacheFactory();
         Mustache mustache = mf.compile(new StringReader(podYaml), "templatePod");
         mustache.execute(writer, KubernetesInstance.getJinJavaContext());
-        String templatizedPodYaml = writer.toString();;
+        String templatizedPodYaml = writer.toString();
 
         Pod elasticAgentPod = new Pod();
         try {
@@ -238,8 +240,7 @@ public class KubernetesInstance {
             e.printStackTrace();
         }
 
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(KUBERNETES_POD_CREATION_TIME_FORMAT);
-        elasticAgentPod.getMetadata().setCreationTimestamp(simpleDateFormat.format(new Date()));
+        elasticAgentPod.getMetadata().setCreationTimestamp(getSimpleDateFormat().format(new Date()));
 
         setContainerEnvVariables(elasticAgentPod, request, settings, pluginRequest);
         setAnnotations(elasticAgentPod, request);

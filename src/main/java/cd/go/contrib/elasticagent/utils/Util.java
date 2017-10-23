@@ -27,11 +27,21 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
 import java.util.Properties;
+import java.util.TimeZone;
+
+import static cd.go.contrib.elasticagent.Constants.KUBERNETES_POD_CREATION_TIME_FORMAT;
 
 public class Util {
 
     public static final Gson GSON = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
+
+    public static SimpleDateFormat getSimpleDateFormat() {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(KUBERNETES_POD_CREATION_TIME_FORMAT);
+        simpleDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+        return simpleDateFormat;
+    }
 
     public static String readResource(String resourceFile) {
         try (InputStreamReader reader = new InputStreamReader(GetViewRequestExecutor.class.getResourceAsStream(resourceFile), StandardCharsets.UTF_8)) {
