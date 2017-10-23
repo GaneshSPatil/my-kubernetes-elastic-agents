@@ -89,19 +89,19 @@
         <label>Specify Elastic Agent Pod Configuration using</label>
         <div class="form_item_block row" style="padding-top: 10px">
             <div class="columns small-9 medium-10 larger-10"
-                 ng-init="PodConfigSpecifiedUsing = PodConfigSpecifiedUsing || 'PodConfigProperties'">
-                <input type="radio" ng-model="PodConfigSpecifiedUsing" value="PodConfigProperties"
+                 ng-init="SpecifiedUsingPodConfiguration = SpecifiedUsingPodConfiguration || 'false'">
+                <input type="radio" ng-model="SpecifiedUsingPodConfiguration" value="false"
                        id="login-using-github"/>
                 <label for="login-using-github">Config Properties</label>
 
-                <input type="radio" ng-model="PodConfigSpecifiedUsing" value="PodYaml"
+                <input type="radio" ng-model="SpecifiedUsingPodConfiguration" value="true"
                        id="login-using-github-enterprise"/>
                 <label for="login-using-github-enterprise">Pod Yaml</label>
             </div>
         </div>
     </div>
 
-    <div ng-show="PodConfigSpecifiedUsing == 'PodConfigProperties'">
+    <div ng-show="SpecifiedUsingPodConfiguration == 'false'">
         <div class="row">
             <div class="columns medium-6 large-5">
                 <label ng-class="{'is-invalid-label': GOINPUTNAME[Image].$error.server}">Image:
@@ -171,7 +171,7 @@
         </div>
     </div>
 
-    <div ng-show="PodConfigSpecifiedUsing == 'PodYaml'">
+    <div ng-show="SpecifiedUsingPodConfiguration == 'true'">
         <div class="form_item_block">
             <label ng-class="{'is-invalid-label': GOINPUTNAME[PodConfiguration].$error.server}">Specify Elastic Agent
                 <code>pod.yaml</code> here
