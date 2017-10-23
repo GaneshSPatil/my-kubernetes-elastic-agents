@@ -20,12 +20,17 @@ import cd.go.contrib.elasticagent.requests.CreateAgentRequest;
 import cd.go.contrib.elasticagent.utils.Size;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.github.mustachejava.DefaultMustacheFactory;
+import com.github.mustachejava.Mustache;
+import com.github.mustachejava.MustacheFactory;
 import io.fabric8.kubernetes.api.model.*;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 
 import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -218,9 +223,16 @@ public class KubernetesInstance {
     public static KubernetesInstance createUsingPodYaml(CreateAgentRequest request, PluginSettings settings, KubernetesClient client, PluginRequest pluginRequest) {
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
         String podYaml = request.properties().get(POD_CONFIGURATION.getKey());
+
+        StringWriter writer = new StringWriter();
+        MustacheFactory mf = new DefaultMustacheFactory();
+        Mustache mustache = mf.compile(new StringReader(podYaml), "templatePod");
+        mustache.execute(writer, KubernetesInstance.getJinJavaContext());
+        String templatizedPodYaml = writer.toString();;
+
         Pod elasticAgentPod = new Pod();
         try {
-            elasticAgentPod = mapper.readValue(podYaml, Pod.class);
+            elasticAgentPod = mapper.readValue(templatizedPodYaml, Pod.class);
         } catch (IOException e) {
             //ignore error here, handle this inside validate!
             e.printStackTrace();
@@ -234,5 +246,14 @@ public class KubernetesInstance {
         setLabels(elasticAgentPod, request);
 
         return createKubernetesPod(client, elasticAgentPod);
+    }
+
+    public static Map<String, String> getJinJavaContext() {
+        HashMap<String, String> context = new HashMap<>();
+        context.put(Constants.POD_POSTFIX, UUID.randomUUID().toString());
+        context.put(Constants.CONTAINER_POSTFIX, UUID.randomUUID().toString());
+        context.put(Constants.GOCD_AGENT_IMAGE, "gocd/gocd-agent-alpine-3.5");
+        context.put(Constants.LATEST_VERSION, "v17.10.0");
+        return context;
     }
 }

@@ -187,7 +187,17 @@
             </label>
             <textarea ng-class="{'is-invalid-input': GOINPUTNAME[PodConfiguration].$error.server}"
                       ng-model="PodConfiguration"
-                      ng-required="false" rows="9" columns="15"></textarea>
+                      ng-required="false" rows="9" columns="15" ng-init="PodConfiguration = (PodConfiguration || 'apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-name-prefix-{{ POD_POSTFIX }}
+  labels:
+    app: web
+spec:
+  containers:
+    - name: gocd-agent-container-{{ CONTAINER_POSTFIX }}
+      image: {{ GOCD_AGENT_IMAGE }}:{{ LATEST_VERSION }}')">
+            </textarea>
             <span class="form_error form-error" ng-class="{'is-visible': GOINPUTNAME[PodConfiguration].$error.server}"
                   ng-show="GOINPUTNAME[PodConfiguration].$error.server">{{GOINPUTNAME[PodConfiguration].$error.server}}</span>
         </div>
