@@ -19,16 +19,18 @@ package cd.go.contrib.elasticagent.executors;
 import cd.go.contrib.elasticagent.RequestExecutor;
 import cd.go.contrib.elasticagent.model.Metadata;
 import cd.go.contrib.elasticagent.requests.ProfileValidateRequest;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.thoughtworks.go.plugin.api.response.DefaultGoPluginApiResponse;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
+import io.fabric8.kubernetes.api.model.Pod;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.IOException;
 import java.util.*;
 
 import static cd.go.contrib.elasticagent.KubernetesPlugin.LOG;
-import static cd.go.contrib.elasticagent.executors.GetProfileMetadataExecutor.IMAGE;
-import static cd.go.contrib.elasticagent.executors.GetProfileMetadataExecutor.POD_CONFIGURATION;
-import static cd.go.contrib.elasticagent.executors.GetProfileMetadataExecutor.SPECIFIED_USING_POD_CONFIGURATION;
+import static cd.go.contrib.elasticagent.executors.GetProfileMetadataExecutor.*;
 import static cd.go.contrib.elasticagent.utils.Util.GSON;
 
 public class ProfileValidateRequestExecutor implements RequestExecutor {
@@ -86,15 +88,28 @@ public class ProfileValidateRequestExecutor implements RequestExecutor {
 
     private void validatePodYaml(HashMap<String, String> properties, ArrayList<Map<String, String>> result) {
         String key = POD_CONFIGURATION.getKey();
-        if (StringUtils.isBlank(properties.get(key))) {
+        String podYaml = properties.get(key);
+        if (StringUtils.isBlank(podYaml)) {
             addNotBlankError(result, key, "Pod Configuration");
+            return;
+        }
+
+        ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+        try {
+            mapper.readValue(podYaml, Pod.class);
+        } catch (IOException e) {
+            addError(result, key, "Invalid Pod Yaml.");
         }
     }
 
     private void addNotBlankError(ArrayList<Map<String, String>> result, String key, String value) {
+        addError(result, key, String.format("%s must not be blank.", value));
+    }
+
+    private void addError(ArrayList<Map<String, String>> result, String key, String message) {
         LinkedHashMap<String, String> validationError = new LinkedHashMap<>();
         validationError.put("key", key);
-        validationError.put("message", String.format("%s must not be blank.", value));
+        validationError.put("message", message);
         result.add(validationError);
     }
 }

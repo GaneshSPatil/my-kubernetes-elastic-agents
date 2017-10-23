@@ -53,4 +53,14 @@ public class ProfileValidateRequestExecutorTest {
         String json = executor.execute().responseBody();
         JSONAssert.assertEquals("[{\"message\":\"Pod Configuration must not be blank.\",\"key\":\"PodConfiguration\"}]", json, JSONCompareMode.NON_EXTENSIBLE);
     }
+
+    @Test
+    public void shouldValidatePodConfiguration() throws Exception {
+        Map<String, String> properties = new HashMap<>();
+        properties.put("SpecifiedUsingPodConfiguration", "true");
+        properties.put("PodConfiguration", "foobar");
+        ProfileValidateRequestExecutor executor = new ProfileValidateRequestExecutor(new ProfileValidateRequest(properties));
+        String json = executor.execute().responseBody();
+        JSONAssert.assertEquals("[{\"message\":\"Invalid Pod Yaml.\",\"key\":\"PodConfiguration\"}]", json, JSONCompareMode.NON_EXTENSIBLE);
+    }
 }

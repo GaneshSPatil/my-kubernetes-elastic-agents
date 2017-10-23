@@ -234,7 +234,7 @@ public class KubernetesInstance {
         try {
             elasticAgentPod = mapper.readValue(templatizedPodYaml, Pod.class);
         } catch (IOException e) {
-            //ignore error here, handle this inside validate!
+            //ignore error here, handle this inside validate profile!
             e.printStackTrace();
         }
 
