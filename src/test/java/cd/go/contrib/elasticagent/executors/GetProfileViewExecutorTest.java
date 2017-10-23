@@ -46,6 +46,9 @@ public class GetProfileViewExecutorTest {
         final Document document = Jsoup.parse(template);
 
         for (Metadata field : GetProfileMetadataExecutor.FIELDS) {
+            if (field.getKey().equals(GetProfileMetadataExecutor.SPECIFIED_USING_POD_CONFIGURATION.getKey())) {
+                continue;
+            }
             final Elements inputFieldForKey = document.getElementsByAttributeValue("ng-model", field.getKey());
             assertThat(inputFieldForKey, hasSize(1));
 
@@ -56,7 +59,7 @@ public class GetProfileViewExecutorTest {
         }
 
         final Elements inputs = document.select("textarea,input[type=text],select");
-        assertThat(inputs, hasSize(GetProfileMetadataExecutor.FIELDS.size()));
+        assertThat(inputs, hasSize(GetProfileMetadataExecutor.FIELDS.size() - 1)); // do not include SPECIFIED_USING_POD_CONFIGURATION key
     }
 
 }

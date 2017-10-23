@@ -75,6 +75,13 @@ public class GetProfileMetadataExecutorTest {
                 "      \"required\": false,\n" +
                 "      \"secure\": false\n" +
                 "    }\n" +
+                "  },\n" +
+                "  {\n" +
+                "    \"key\": \"SpecifiedUsingPodConfiguration\",\n" +
+                "    \"metadata\": {\n" +
+                "      \"required\": true,\n" +
+                "      \"secure\": false\n" +
+                "    }\n" +
                 "  }\n" +
                 "]";
 
