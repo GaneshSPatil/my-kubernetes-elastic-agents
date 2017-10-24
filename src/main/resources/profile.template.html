@@ -74,6 +74,10 @@
             font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
         }
 
+        [data-plugin-style-id="kubernetes-plugin"] .highlight {
+            background: #f0f0f0;
+        }
+
         [data-plugin-style-id="kubernetes-plugin"] .code {
             font-family: Consolas, "Liberation Mono", Courier, monospace;
             padding: 16px;
@@ -185,7 +189,7 @@
                   </span>
                 </div>
             </label>
-            <textarea ng-class="{'is-invalid-input': GOINPUTNAME[PodConfiguration].$error.server}"
+            <textarea class="highlight" ng-class="{'is-invalid-input': GOINPUTNAME[PodConfiguration].$error.server}"
                       ng-model="PodConfiguration"
                       ng-required="false" rows="9" columns="15" ng-init="PodConfiguration = (PodConfiguration || 'apiVersion: v1
 kind: Pod
