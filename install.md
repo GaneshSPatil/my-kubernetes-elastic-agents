@@ -33,29 +33,38 @@ on Windows.
 2. Click on **_Add_** to create new elastic agent profile
     1. Specify `id` for profile.
     2. Select `Kubernetes Elastic Agent Plugin` for **_Plugin id_**
-    3. Specify GoCD elastic agent docker image name.
-    4. Specify Maximum Memory limit. Container memory will be limit to the value specified here.
-    5. Specify Maximum CPU limit. Container memory will be limit to the value specified here.
-    6. Optionally specify Environment Variables. These variables are passed to the container for use.
-    7. Save your profile.
+    3. Configure Kubernetes GoCD elastic agent Pod using:
+       - Config Properties
+            1. Specify GoCD elastic agent docker image name.
+            2. Specify Maximum Memory limit. Container memory will be limit to the value specified here.
+            3. Specify Maximum CPU limit. Container memory will be limit to the value specified here.
+            4. Optionally specify Environment Variables. These variables are passed to the container for use.
+            
+            ![Create elastic profile using config properties][3]
+
+        - Pod Configuration
+            1. Specify GoCD elastic agent Pod Yaml configuration.
+            
+            ![Create elastic profile using pod configuration][4]
+    4. Save your profile.
     
-![Create elastic profile][3]    
+    
 
 ### Configure job to use an elastic agent profile
 
 1. Click the gear icon on **_Pipeline_**
 
-![Pipeline][4]
+![Pipeline][5]
 
 2. Click on **_Quick Edit_** button
 
-![Quick edit][5]
+![Quick edit][6]
 
 3. Click on **_Stages_**
 4. Create/Edit a job
 5. Enter the `unique id` of an elastic profile in Job Settings
 
-![Configure a job][6]
+![Configure a job][7]
 
 6. Save your changes
 
@@ -76,7 +85,8 @@ $ GO_SERVER_SYSTEM_PROPERTIES="-Dplugin.cd.go.contrib.elasticagent.kubernetes.lo
 
 [1]: images/plugin_settings.png     "Kubernetes Plugin settings"
 [2]: images/profiles_page.png  "Elastic profiles"
-[3]: images/profile.png "Create elastic profile"
-[4]: images/pipeline.png  "Pipeline"
-[5]: images/quick-edit.png  "Quick edit"
-[6]: images/configure-job.png  "Configure a job"
+[3]: images/profile.png "Create elastic profile using config properties"
+[4]: images/profile-with-pod-yaml.png "Create elastic profile using pod configuration"
+[5]: images/pipeline.png  "Pipeline"
+[6]: images/quick-edit.png  "Quick edit"
+[7]: images/configure-job.png  "Configure a job"

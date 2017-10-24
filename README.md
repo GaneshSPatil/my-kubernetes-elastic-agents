@@ -8,7 +8,7 @@ Documentation for installation is available [here](install.md)
 
 ## Building the code base
 
-To build the jar, run `./gradlew clean prepare build`
+To build the jar, run `./gradlew clean build`
 
 ## License
 
