@@ -83,8 +83,8 @@ $ GO_SERVER_SYSTEM_PROPERTIES="-Dplugin.cd.go.contrib.elasticagent.kubernetes.lo
 ```
 
 
-[1]: images/plugin_settings.png     "Kubernetes Plugin settings"
-[2]: images/profiles_page.png  "Elastic profiles"
+[1]: images/plugin-settings.png     "Kubernetes Plugin settings"
+[2]: images/profiles-page.png  "Elastic profiles"
 [3]: images/profile.png "Create elastic profile using config properties"
 [4]: images/profile-with-pod-yaml.png "Create elastic profile using pod configuration"
 [5]: images/pipeline.png  "Pipeline"
