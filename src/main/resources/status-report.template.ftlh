@@ -167,8 +167,8 @@
                             <dd class="name">${node.name!}</dd>
                             <dt>External ID</dt>
                             <dd class="hostname">${node.externalID!}</dd>
-                            <dt>IP Addresses</dt>
-                            <dd class="hostname">${node.nodeAddresses!}</dd>
+                            <dt>IP Address</dt>
+                            <dd class="hostname">${node.nodeAddress!}</dd>
                         </dl>
                     </div>
                     <div class="right">

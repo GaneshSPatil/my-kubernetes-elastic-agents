@@ -37,16 +37,14 @@ public class KubernetesNode {
     private final String allocatableCPU;
     private final String allocatableMemory;
     private final String externalID;
-    private final String nodeAddresses;
+    private final String nodeAddress;
     private final String kubeletVersion;
     private final String kubeProxyVersion;
 
     public KubernetesNode(Node node) {
         name = node.getMetadata().getName();
         externalID = node.getSpec().getExternalID();
-        nodeAddresses = node.getStatus().getAddresses().stream()
-                .map(nodeAddress -> nodeAddress.getAddress())
-                .reduce("", (all, current) -> all.concat(" [").concat(current).concat("]"));
+        nodeAddress = node.getStatus().getAddresses().get(0).getAddress();
 
         totalCPU = node.getStatus().getCapacity().get("cpu").getAmount();
         String memory = node.getStatus().getCapacity().get("memory").getAmount();
@@ -115,8 +113,8 @@ public class KubernetesNode {
         return externalID;
     }
 
-    public String getNodeAddresses() {
-        return nodeAddresses;
+    public String getNodeAddress() {
+        return nodeAddress;
     }
 
     public String getKubeletVersion() {
