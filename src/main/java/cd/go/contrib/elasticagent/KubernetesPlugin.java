@@ -75,7 +75,8 @@ public class KubernetesPlugin implements GoPlugin {
                 case REQUEST_SERVER_PING:
                     refreshInstances();
                     return new ServerPingRequestExecutor(agentInstances, pluginRequest).execute();
-
+                case REQUEST_STATUS_REPORT:
+                    return new StatusReportExecutor(pluginRequest).execute();
                 default:
                     throw new UnhandledRequestTypeException(request.requestName());
             }
