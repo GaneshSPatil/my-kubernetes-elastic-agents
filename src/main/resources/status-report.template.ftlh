@@ -112,6 +112,13 @@
         text-overflow: ellipsis;
     }
 
+    [data-plugin-style-id="kubernetes-plugin"] .name {
+        min-width:     300px;
+        max-width:     300px;
+        overflow:      hidden;
+        text-overflow: ellipsis;
+    }
+
     [data-plugin-style-id="kubernetes-plugin"] dl.properties.inline dt:first-child {
         min-width:   auto;
         margin-left: 10px;
@@ -157,7 +164,7 @@
                         <i class="fa fa-desktop" aria-hidden="true"></i>
                         <dl class="properties inline">
                             <dt>Node Name</dt>
-                            <dd class="hostname">${node.name!}</dd>
+                            <dd class="name">${node.name!}</dd>
                             <dt>External ID</dt>
                             <dd class="hostname">${node.externalID!}</dd>
                             <dt>IP Addresses</dt>
